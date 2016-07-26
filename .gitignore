@@ -1,0 +1,21 @@
+# No need for people cluster conf
+cluster.conf
+cluster.conf*
+
+# Any Key files should be ignored
+id_rsa
+id_rsa.pub
+**/*.pem
+**/id_rsa
+**/id_rsa.pub
+
+# Local Directories
+cldb_marathon/
+zk_marathon/
+stdnode_marathon/
+mapr_defaults/
+client_install/
+
+# Files specific to an installation
+maprdocker.marathon
+ip_detect.sh

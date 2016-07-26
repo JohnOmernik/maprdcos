@@ -15,8 +15,9 @@ echo "It's highly recommened your intial user for this is zetaadm. This user sho
 echo "You can change the initial user in the generated config, however the user must have the proper privileges"
 echo ""
 IUSER="zetaadm"
-echo "Please pass the path to the private key for the initial user (typically zetaadm). (This may be located at /home/zetaaadm/.ssh/id_rsa, or whereever you may have put it)"
-read -p "Path to keyfile: " -e -i "/home/zetaadm/.ssh/id_rsa" IKEY
+echo ""
+echo "Please pass the path to the private key for the initial user ($IUSER). (This may be located at /home/$IUSER/.ssh/id_rsa, or whereever you may have put it)"
+read -p "Path to keyfile: " -e -i "/home/$IUSER/.ssh/id_rsa" IKEY
 
 CURUSER=$(whoami)
 if [ "$CURUSER" != "$IUSER" ]; then
