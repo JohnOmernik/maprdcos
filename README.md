@@ -35,6 +35,16 @@ This assumes some things about your cluster
 
 # Install Steps
 
+## Create Users
+---------------------
+MapR and this install needs some users created on all nodes. I recommend installing these users on all nodes, including masters. Use the script 0_zeta_user_prep.sh
+Some Notes:
+- The script will take a list of nodes and will ask for the password for mapr and zetaaadm and then sync passwords
+- The user the script runs as MUST have ssh and sudo permissions on all nodes
+- It will create (if one doesn't exist) a ssh key for use on the nodes
+- If ran after initial creation it can be used to sync passwords. 
+
+
 ## Cluster Conf (cluster.conf)
 ---------------------
 
