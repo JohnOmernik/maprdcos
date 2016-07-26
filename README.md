@@ -8,6 +8,7 @@ This repo allows a (non-standard DCOS) install of MapR running in Docker on a DC
 ---------------------
 This assumes some things about your cluster
 - DCOS is running and properly configured 
+- The nodes with the MapR Fileservers will be run have some attached storage (MapR prefers unformatted, direct attached disks.  These will be dedicated to MapR on the nodes)
 - The nodes have a couple of local users configured
     - zetaadm - UID 2500 (the UID can be changed, it just has to be the same on all nodes)
     - mapr - UID 2000 (the UID can be changed, it just has to be the same on all nodes)
@@ -25,21 +26,81 @@ This assumes some things about your cluster
 
 
 
+## Current Issues:
+---------------------
+- This is untested.  More work needs to be done to ensure production load capabilities
+- MapR does some work to ulimits and other system settings. WE need feed back to ensure optimal performance
+- NFS mounting doesn't work right now. Not sure why. 
+- ??
+
+# Install Steps
+
 ## Cluster Conf (cluster.conf)
 ---------------------
 
 This is where the initial configuration of your cluster comes from. It is created by running through the script: 1_create_cluster.conf.sh
 Some Notes:
 - Right now the IUSER is hardcoded to by zetaadm. This is on purpose. If you think you know what you are doing, and want to take a risk, you can change it yourself. 
-
+- There is a manual step we could improve on. We have to include the docker registry for bootstrap in the docker daemon startup. It's specified in the script. 
+- More Docs are needed on this, but I tried to include in the script and comments.  
 
 ## Install Docker Registry
 ---------------------
 
 I like to run my docker registry ON MapRFS, however, there is no MapRFS when I am installing MapR, thus I create a "bootstrap" Docker Registry to host the MapR Docker images" This is done in 2_install_docker_reg.sh
+Some Notes:
+- This will only have local storage
+- We need (todo) to move images from local boot strap to cluster wide registry
+- This will be run as mapr/maprdocker 
 
 ## Build Zookeeper Image
 ---------------------
-There are two docker images that need to be build. The first is the Zookeeper image.  This is done in 3_build_zk_docker.sh 
+There are two docker images that need to be built. The first is the Zookeeper image.  This is done in 3_build_zk_docker.sh 
+Some Notes:
+- This should be pretty basic
+- It will pull ubuntu:latest prior (if you don't have this)
+- This docker build does display the credentials for the mapr user and zetaadm user.  I will work on an issue to discuss the best way to handle this
+
+## Run Zookeeper
+---------------------
+Once built, the Zookeepers will be started. This happens here: 4_run_zk_docker.sh
+Some Notes:
+- As will all things, each individual ZK will be given it's own marathon application. For ZK it will be under mapr/zks/.  The instance will be both unique and tied to a host so you can't scale beyond one instance
+- Local storage will be used for zkdata and logs. This will be in the MAPR_INST variable. Since we want things to run on the same node, this works well
+- We should look at moving the conf directory to be local storage. It will make updating the conf easier down the line (add todo)
+
+## Build MapR Docker Image
+---------------------
+We need to build the mapr docker image. This is done in 5_build_mapr_docker.sh 
+Some Notes:
+- This is a large image. (2.15 GB) We may try to make this smaller, but it shoudn't matter much. 
+
+## Run MapR Docker
+---------------------
+Where the cluster gets built. 6_run_mapr_docker.sh to read conf and then run install_mapr_node.sh on each node
+Some Notes:
+- Will base install the nodes in inodes in the conf.
+- You can add more ndoes with the install_mapr_node.sh script
+- Will show the disk for each node, you need to confirm or change. 
+- Local storage is used on each node for logs, conf, and roles
+- Each instance will get it's own marathon app under mapr/cldbs or mapr/stdnodes
+- You will need to license your own mapr follow the links to do so. 
+
+## Fuse Client Install/Uninstall
+---------------------
+fuse_install.sh and fuse_remove.sh to add or remove a fuse_client. 
+Some Notes:
+- It will mount at /mapr/$CLUSTERNAME
+- It's licensed, only 10 are allowed with base M3 license
+- Ask your mapr Rep for more license if needed
+
+
+## destroy_node.sh and destroy_zk.sh
+---------------------
+These scripts remove the local storage to start from scratch. 
+Some Notes:
+- Does not (at this time) remove the marathon apps. You have to do that manually
+
+ 
 
 

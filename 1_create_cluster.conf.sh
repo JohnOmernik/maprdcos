@@ -64,10 +64,34 @@ echo "---------------------------------------"
 
 echo "As we build the docker containers, we need a temporary Docker registry to host the containers"
 echo "This is ONLY for mapr based containers" 
-echo "It will be named maprdocker.marathon.mesos"
+echo "It will be named maprdocker.mapr.marathon.mesos by default, only change this name if you understand what that means"
 echo "Which host do you wish to run it on?" 
-read -p "Docker Registry Host: " -e -i "maprdocker.marathon.mesos" DOCKER_REG_HOST
+read -p "Docker Registry Host: " -e -i "maprdocker.mapr.marathon.mesos" DOCKER_REG_HOST
 read -p "Which port should the docker register run on (we recommend 5000): " -e -i "5000" DOCKER_REG_PORT
+echo ""
+echo ""
+echo "**********************************************************"
+echo "You will have to update your docker daemons to accept insecure registries to the above registry."
+echo "To this run run the following commands on each node:"
+echo ""
+echo "sudo mkdir -p /etc/systemd/system/docker.service.d && sudo tee /etc/systemd/system/docker.service.d/override.conf <<- EOF"
+echo "[Service]"
+echo "ExecStart="
+echo "ExecStart=/usr/bin/docker daemon --storage-driver=overlay --insecure-registry=maprdocker.mapr.marathon.mesos:5000 -H fd://"
+echo "EOF"
+echo ""
+echo "sudo systemctl daemon-reload"
+echo "sudo service docker restart"
+echo ""
+echo "Now, if you already have override.conf. The key part you need to add to the ExecStart line is:"
+echo ""
+echo "--insecure-registry=maprdocker.mapr.marathon.mesos:5000"
+echo ""
+echo "Then:"
+echo "sudo systemctl daemon-reload"
+echo "sudo service docker restart"
+echo "**********************************************************"
+
 
 echo ""
 echo "---------------------------------------"
@@ -260,4 +284,4 @@ export ZOOCFG=\$TZOOCFG
 
 EOF
 
-
+echo "cluster.conf has been creataed!"

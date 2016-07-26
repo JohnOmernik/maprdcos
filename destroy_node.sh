@@ -25,7 +25,7 @@ read -p "Destroy node? " -e -i "N" TEST
 if [ "$TEST" == "Y" ]; then
     echo "Good luck with that"
     echo "Removing MapR Dirs. If there is things running, it's gonna hork it up"
-    ssh $NODE_HOST "sudo rm -rf /opt/mapr/conf && sudo rm -rf /opt/mapr/logs && sudo rm -rf /opt/mapr/roles"
+    ssh $NODE_HOST "sudo rm -rf ${MAPR_INST}/conf && sudo rm -rf ${MAPR_INST}/logs && sudo rm -rf ${MAPR_INST}/roles"
 
 
 else
