@@ -181,6 +181,10 @@ else
 fi
 
 echo ""
+echo "Removing NFS Service until NFS Bug gets fixed"
+ssh $NODE_HOST "sudo rm ${MAPR_INST}/roles/nfs"
+
+echo ""
 echo "Updating permissions of directories"
 ssh $NODE_HOST "sudo chown -R mapr:mapr ${MAPR_INST}/conf && sudo chown -R mapr:mapr ${MAPR_INST}/logs && sudo chmod -R 755 ${MAPR_INST}/conf && sudo chmod -R 777 ${MAPR_INST}/logs"
 

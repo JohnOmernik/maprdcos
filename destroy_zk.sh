@@ -25,7 +25,7 @@ read -p "Destroy zk? " -e -i "N" TEST
 if [ "$TEST" == "Y" ]; then
     echo "Good luck with that"
     echo "Removing MapR Dirs. If there is things running, it's gonna hork it up"
-    ssh $NODE_HOST "sudo rm -rf /opt/mapr/zkdata && sudo rm -rf /opt/mapr/zookeeper"
+    ssh $NODE_HOST "sudo rm -rf ${MAPR_INST}/zkdata && sudo rm -rf ${MAPR_INST}/zookeeper"
 
 
 else
