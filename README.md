@@ -29,6 +29,9 @@ This assumes some things about your cluster
 ---------------------
 
 This is where the initial configuration of your cluster comes from. It is created by running through the script: 1_create_cluster.conf.sh
+Some Notes:
+- Right now the IUSER is hardcoded to by zetaadm. This is on purpose. If you think you know what you are doing, and want to take a risk, you can change it yourself. 
+
 
 ## Install Docker Registry
 ---------------------
