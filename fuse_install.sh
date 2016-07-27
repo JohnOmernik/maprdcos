@@ -122,6 +122,8 @@ fi
 scp ./client_install/$INST_CLIENT $NODE_HOST:/home/$IUSER/
 scp ./client_install/$INST_POSIX $NODE_HOST:/home/$IUSER/
 ssh $NODE_HOST "sudo $INST_CMD $INST_CLIENT"
+NSUB="export MAPR_SUBNETS=$SUBNETS"
+ssh $NODE_HOST "sudo sed -i -r \"s@#export MAPR_SUBNETS=.*@${NSUB}@g\" /opt/mapr/conf/env.sh"
 ssh $NODE_HOST "sudo /opt/mapr/server/configure.sh -N $CLUSTERNAME -c -C $CLDBS"
 ssh $NODE_HOST "sudo mkdir -p /mapr"
 ssh $NODE_HOST "sudo $INST_CMD $INST_POSIX"

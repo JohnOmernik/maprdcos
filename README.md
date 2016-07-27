@@ -109,8 +109,7 @@ Some Notes:
 ---------------------
 These scripts remove the local storage to start from scratch. 
 Some Notes:
-- Does not (at this time) remove the marathon apps. You have to do that manually
-
+- Does stop and destroy the app in marathon as well. 
  
 
 
