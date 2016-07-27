@@ -22,19 +22,14 @@ if [ ! -f "./ip_detect.sh" ]; then
 fi
 
 
+UBUNTU_MAPR_LOOP_BASE="http://package.mapr.com/releases/v5.1.0/ubuntu/pool/optional/m/mapr-loopbacknfs/"
+UBUNTU_MAPR_LOOP_FILE="mapr-loopbacknfs_5.1.0.37549.GA-1_amd64.deb"
 
-
-UBUNTU_MAPR_CLIENT_BASE="http://package.mapr.com/releases/v5.1.0/ubuntu/pool/optional/m/mapr-client/"
-UBUNTU_MAPR_CLIENT_FILE="mapr-client_5.1.0.37549.GA-1_amd64.deb"
-UBUNTU_MAPR_POSIX_BASE="http://package.mapr.com/releases/v5.1.0/ubuntu/pool/optional/m/mapr-posix-client-basic/"
-UBUNTU_MAPR_POSIX_FILE="mapr-posix-client-basic_5.1.0.37549.GA-1_amd64.deb"
-
-RH_MAPR_CLIENT_BASE="http://package.mapr.com/releases/v5.1.0/redhat/"
-RH_MAPR_CLIENT_FILE="mapr-client-5.1.0.37549.GA-1.x86_64.rpm"
-RH_MAPR_POSIX_BASE="http://package.mapr.com/releases/v5.1.0/redhat/"
-RH_MAPR_POSIX_FILE="mapr-posix-client-basic-5.1.0.37549.GA-1.x86_64.rpm"
+RH_MAPR_LOOP_BASE="http://package.mapr.com/releases/v5.1.0/redhat/"
+RH_MAPR_LOOP_FILE="mapr-loopbacknfs-5.1.0.37549.GA-1.x86_64.rpm"
 
 NODE_HOST=$1
+INST_HOME="/usr/local/mapr-loopbacknfs"
 
 if [ "$NODE_HOST" == "" ]; then
     echo "This script must be passed a hostname"
@@ -49,16 +44,6 @@ if [ "$NETTEST" == "" ]; then
     exit 1
 fi
 
-
-CONFLIST=$(ssh $NODE_HOST "ls ${MAPR_LIST}/conf/")
-
-if [ "$CONFLIST" != "" ]; then
-    echo "Fuse client can not be installed on physical node running the docker container. Please use loopback-nfs"
-    exit 1
-fi
-
-
-
 # Need to update for Cent/RH detection We are only detecting Ubuntu right now
 DIST=$(ssh $NODE_HOST "grep DISTRIB_ID /etc/lsb-release")
 
@@ -72,10 +57,10 @@ else
     exit 1
 fi
 
-CURCHK=$(ssh $NODE_HOST "ls /opt/mapr 2> /dev/null")
+CURCHK=$(ssh $NODE_HOST "ls ${INST_HOME} 2> /dev/null")
 
 if [ "$CURCHK" != "" ]; then
-    echo "Something found in /opt/mapr will not attempt to install"
+    echo "Something found in ${INST_HOME} will not attempt to install"
     exit 1
 fi
 
@@ -98,7 +83,7 @@ fi
 mkdir -p ./client_install
 
 if [ "$INST_DIST" == "ubuntu" ]; then
-    if [ ! -f "./client_install/$UBUNTU_MAPR_CLIENT_FILE" ] || [ ! -f "./client_install/$UBUNTU_MAPR_POSIX_FILE" ]; then
+    if [ ! -f "./client_install/$UBUNTU_MAPR_LOOP_FILE" ]; then
         echo "Couldn't find MapR Files"
         read -p "Should we Download the Ubuntu files? (Installation will not continue if N) " -e -i "Y" DL
         if [ "$DL" != "Y" ]; then
@@ -106,15 +91,14 @@ if [ "$INST_DIST" == "ubuntu" ]; then
             exit 1
         fi
         cd ./client_install
-        wget ${UBUNTU_MAPR_CLIENT_BASE}${UBUNTU_MAPR_CLIENT_FILE}
-        wget ${UBUNTU_MAPR_POSIX_BASE}${UBUNTU_MAPR_POSIX_FILE}
+        wget ${UBUNTU_MAPR_LOOP_BASE}${UBUNTU_MAPR_LOOP_FILE}
         cd ..
     fi
-    INST_CLIENT=$UBUNTU_MAPR_CLIENT_FILE
-    INST_POSIX=$UBUNTU_MAPR_POSIX_FILE
+    INST_LOOP=$UBUNTU_MAPR_LOOP_FILE
     INST_CMD="dpkg -i"
+    INST_ARP="sudo apt-get install -y nfs-common rpcbind iputils-arping"
 elif [ "$INST_DIST" == "rh" ]; then
-    if [ ! -f "./client_install/$RH_MAPR_CLIENT_FILE" ] || [ ! -f "./client_install/$RH_MAPR_POSIX_FILE" ]; then
+    if [ ! -f "./client_install/$RH_MAPR_LOOP_FILE" ]; then
         echo "Couldn't find MapR Files"
         read -p "Should we Download the RH files? (Installation will not continue if N) " -e -i "Y" DL
         if [ "$DL" != "Y" ]; then
@@ -122,24 +106,30 @@ elif [ "$INST_DIST" == "rh" ]; then
             exit 1
         fi
         cd ./client_install
-        wget ${RH_MAPR_CLIENT_BASE}${RH_MAPR_CLIENT_FILE}
-        wget ${RH_MAPR_POSIX_BASE}${RH_MAPR_POSIX_FILE}
+        wget ${RH_MAPR_LOOP_BASE}${RH_MAPR_LOOP_FILE}
         cd ..
     fi
-    INST_CLIENT=$RH_MAPR_CLIENT_FILE
-    INST_POSIX=$RH_MAPR_POSIX_FILE
+    INST_LOOP=$RH_MAPR_LOOP_FILE
     INST_CMD="rpm -ivh"
 fi
 
-scp ./client_install/$INST_CLIENT $NODE_HOST:/home/$IUSER/
-scp ./client_install/$INST_POSIX $NODE_HOST:/home/$IUSER/
-ssh $NODE_HOST "sudo $INST_CMD $INST_CLIENT"
+scp ./client_install/$INST_LOOP $NODE_HOST:/home/$IUSER/
+ssh $NODE_HOST "$INST_ARP"
+ssh $NODE_HOST "sudo $INST_CMD $INST_LOOP"
+
 NSUB="export MAPR_SUBNETS=$SUBNETS"
-ssh $NODE_HOST "sudo sed -i -r \"s@#export MAPR_SUBNETS=.*@${NSUB}@g\" /opt/mapr/conf/env.sh"
-ssh $NODE_HOST "sudo /opt/mapr/server/configure.sh -N $CLUSTERNAME -c -C $CLDBS"
+
+ssh $NODE_HOST "echo \"$NSUB\"|sudo tee -a ${INST_HOME}/conf/env.sh"
+ssh $NODE_HOST "echo \"export MAPR_HOME=${INST_HOME}\"|sudo tee -a ${INST_HOME}/conf/env.sh"
+ssh $NODE_HOST "echo \"$CLUSTERNAME secure=false $CLDBS\"|sudo tee -a ${INST_HOME}/conf/mapr-clusters.conf"
+ssh $NODE_HOST "echo \"$NODE_HOST-nfsloop\"|sudo tee ${INST_HOME}/hostname"
+
 ssh $NODE_HOST "sudo mkdir -p /mapr"
-ssh $NODE_HOST "sudo $INST_CMD $INST_POSIX"
-ssh $NODE_HOST "sudo /etc/init.d/mapr-posix-client-basic start"
+
+ssh $NODE_HOST "sudo /etc/init.d/mapr-loopbacknfs start"
+
+ssh $NODE_HOST "sudo mount -t nfs -o nfsvers=3,noatime,rw,nolock,hard,intr localhost:/mapr /mapr"
+
 echo ""
 echo "Installed - ls /mapr/$CLUSTERNAME"
 echo ""
