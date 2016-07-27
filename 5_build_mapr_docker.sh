@@ -25,6 +25,8 @@ cat > ./maprdocker/dockerrun.sh << EOL3
 #!/bin/bash
 #This is run if there is no disktab in /opt/mapr/conf
 
+service rpcbind start
+
 if [ ! -f "/opt/mapr/conf/mapr-clusters.conf" ]; then
     echo "No mapr-clusters.conf found - Assuming New Install Running Config based on settings"
     /opt/mapr/server/mruuidgen > /opt/mapr/hostid

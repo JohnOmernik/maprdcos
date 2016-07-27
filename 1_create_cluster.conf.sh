@@ -157,8 +157,22 @@ read -p "Enter the initial nodes and their disks: " INITIAL_NODES
 
 echo ""
 echo "---------------------------------------"
+echo "Please enter the list of nodes that you want to include the NFS Service on."
+echo "It should be a CSV list of nodes: node1,node2,node3"
+echo ""
+read -p "Enter nfs nodes: " NFS_NODES
+echo ""
+
+
+
+echo ""
+echo "---------------------------------------"
 echo "User to run MapR Service as. We recommend mapr with UID 2000 as the default"
 read -p "Enter the user for MapR services: " -e -i "mapr" MAPR_USER
+
+
+
+
 
 echo ""
 echo "---------------------------------------"
@@ -239,6 +253,7 @@ export ZK_CLIENT_PORT="$ZK_CLIENT_PORT"
 export ZK_MASTER_ELECTION_PORT="$ZK_MASTER_ELECTION_PORT"
 export ZK_QUORUM_PORT="$ZK_QUORUM_PORT"
 
+export NFS_NODES="$NFS_NODES"
 export MAPR_CONF_OPTS=""
 export CLUSTERNAME="$CLUSTERNAME"
 export SUBNETS="$SUBNETS"
