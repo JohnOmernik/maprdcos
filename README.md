@@ -29,9 +29,10 @@ This assumes some things about your cluster
 ## Current Issues:
 ---------------------
 - This is untested.  More work needs to be done to ensure production load capabilities
-- MapR does some work to ulimits and other system settings. WE need feed back to ensure optimal performance
-- NFS mounting doesn't work right now. Not sure why. 
-- ??
+- MapR does some work to ulimits and other system settings. We need feedback to ensure optimal performance
+- Runnnig a mapr-client on the physical node where the server container is running doesn't work. Some odd bugs right now I am tracking down.
+  - This means the mapr-fuse client won't work as it relies on the mapr-client. use loopback-nfs instead, that is working on all nodes
+- ??? Please report new ones to issues!
 
 # Install Steps
 
@@ -103,13 +104,20 @@ Some Notes:
 - It will mount at /mapr/$CLUSTERNAME
 - It's licensed, only 10 are allowed with base M3 license
 - Ask your mapr Rep for more license if needed
+- Will not work with physical nodes that are hosting docker containers. Working on that bug. Use loopback nfs instead. 
 
+## Loopback-nfs Client Install/Uninstall
+---------------------
+loop_install.sh and loop_remove.sh will add or remove a loopback nfs client.
+- It will mount at /mapr/$CLUSTERNAME
+- It's licensed, only 10 are allowed with base M3 license
+- Ask your mapr Rep for more license if needed
 
 ## destroy_node.sh and destroy_zk.sh
 ---------------------
 These scripts remove the local storage to start from scratch. 
 Some Notes:
 - Does stop and destroy the app in marathon as well. 
- 
+- If it fails try the fully qualified name (it has to be what ever is in the cldb, zk, initial node string) 
 
 
