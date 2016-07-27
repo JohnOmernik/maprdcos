@@ -180,9 +180,11 @@ else
     MARATHON_CPUS=2
 fi
 
-echo ""
-echo "Removing NFS Service until NFS Bug gets fixed"
-ssh $NODE_HOST "sudo rm ${MAPR_INST}/roles/nfs"
+NFS_CHK=$(echo -n ${NFS_NODES}|grep ${NODE_HOST})
+
+if [ "$NFS_CHK" == "" ]; then
+    ssh $NODE_HOST "sudo rm ${MAPR_INST}/roles/nfs"
+fi
 
 echo ""
 echo "Updating permissions of directories"
