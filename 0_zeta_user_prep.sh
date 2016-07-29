@@ -51,7 +51,7 @@ echo "If permissions are not set correctly, this script will not run well."
 
 read -p "Do you wish to proceed with this script? Y/N: " OURTEST
 
-if [ "$OURTEST" != "Y" ]; then
+if [ "$OURTEST" != "Y" ] && [ "$OURTEST" != "y" ]; then
     echo "Exiting"
     exit 0
 fi
