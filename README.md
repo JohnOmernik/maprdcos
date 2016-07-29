@@ -45,6 +45,9 @@ Some Notes:
 - It will create (if one doesn't exist) a ssh key for use on the nodes
 - If ran after initial creation it can be used to sync passwords. 
 
+*NOTE: We store the user credentials in plain text in a file at /home/zetaadm/creds/ - We do lock down this directory but be aware - We can discuss options more in an ISSUE 
+
+
 
 ## Cluster Conf (cluster.conf)
 ---------------------

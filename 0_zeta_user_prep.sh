@@ -205,7 +205,7 @@ EOC
 
 sudo mv /home/${IUSER}/creds.txt /home/zetaadm/creds/
 sudo chown -R zetaadm:zetaadm /home/zetaadm/creds
-sudo chmod 700 /home/zetaadm/creds
+sudo chmod -R 700 /home/zetaadm/creds
 
 PUBLOC="/home/zetaadm/.ssh/id_rsa.pub"
 PRIVLOC="/home/zetaadm/.ssh/id_rsa"
