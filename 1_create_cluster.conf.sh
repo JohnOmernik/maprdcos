@@ -163,7 +163,11 @@ echo ""
 read -p "Enter nfs nodes: " NFS_NODES
 echo ""
 
-
+echo ""
+echo "---------------------------------------"
+echo "If you need to specify a HTTP_PROXY for docker building, please enter it here"
+echo "If this variable is filled, it will add the proxy lines to the docker files for building the images"
+read -p "Enter the proxy information (blank for none): " DOCKER_PROXY
 
 echo ""
 echo "---------------------------------------"
@@ -247,6 +251,8 @@ export MAPR_INST="$MAPR_INST"
 export DOCKER_REG_HOST="$DOCKER_REG_HOST"
 export DOCKER_REG_PORT="$DOCKER_REG_PORT"
 export DOCKER_REG_URL="\${DOCKER_REG_HOST}:\${DOCKER_REG_PORT}"
+export DOCKER_PROXY="$DOCKER_PROXY"
+
 
 export ZK_STRING="$ZK_STRING"
 export ZK_CLIENT_PORT="$ZK_CLIENT_PORT"

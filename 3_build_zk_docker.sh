@@ -63,9 +63,26 @@ cat > ./zkdocker/runzkdocker.sh << EOL3
 su -c "/opt/mapr/zookeeper/zookeeper-3.4.5/bin/zkServer.sh start-foreground" mapr
 EOL3
 
+if [ "$DOCKER_PROXY" != "" ]; then
+    DOCKER_LINE1="ENV http_proxy=$DOCKER_PROXY"
+    DOCKER_LINE2="ENV HTTP_PROXY=$DOCKER_PROXY"
+    DOCKER_LINE3="ENV https_proxy=$DOCKER_PROXY"
+    DOCKER_LINE4="ENV HTTPS_PROXY=$DOCKER_PROXY"
+else
+    DOCKER_LINE1=""
+    DOCKER_LINE2=""
+    DOCKER_LINE3=""
+    DOCKER_LINE4=""
+fi
+
 
 cat > ./zkdocker/Dockerfile << EOL
 FROM ubuntu:latest
+
+$DOCKER_LINE1
+$DOCKER_LINE2
+$DOCKER_LINE3
+$DOCKER_LINE4
 
 RUN adduser --disabled-login --gecos '' --uid=2500 zetaadm
 RUN adduser --disabled-login --gecos '' --uid=2000 mapr
