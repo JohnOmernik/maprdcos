@@ -21,21 +21,26 @@ MAPR_ID="2000"
 
 HOSTS=$1
 
+# Make sure that we have a list of hosts to use, if not, exit
 if [ "$HOSTS" == "" ]; then
     echo "This script takes a single argument, enclosed by double quotes, of space separated node names to update"
     exit 1
 fi
 
+# Make sure we only have one argument, if not, exit
 TEST=$2
 if [ "$TEST" != "" ]; then
     echo "Please only provide a single argument, enclosed by double quotes, of space separated node names to update"
     exit 1
 fi
 
+# Check to see if we are root (by running the $SUDO_TEST)
 if [ "$SUDO_TEST" != "root" ]; then
-    echo "This script must be run with a user with sudo privs"
+    echo "This script must be run with a user with sudo privileges"
     exit 1
 fi
+
+# Iterate through each node specified in the hosts argument and check to see if the user is root or not
 echo ""
 echo "-------------------------------------------------------------------"
 echo "Status of requested Nodes. If root is listed, permissions are setup correctly"
@@ -49,6 +54,7 @@ echo ""
 echo "If any of the above nodes do not say root next to the name, then the permissions are not set correctly" 
 echo "If permissions are not set correctly, this script will not run well."
 
+# Verify that the user wants to continue
 read -p "Do you wish to proceed with this script? Y/N: " OURTEST
 
 if [ "$OURTEST" != "Y" ] && [ "$OURTEST" != "y" ]; then
@@ -57,19 +63,21 @@ if [ "$OURTEST" != "Y" ] && [ "$OURTEST" != "y" ]; then
 fi
 
 
+# Ask the user for the passwords for the mapr and zetaadm users
 echo ""
 echo "--------------------------------------------------"
 ####################
-###### ADD zetadm user and sync passwords on mapr User
+###### ADD zetaadm user and sync passwords on mapr User
 echo "Prior to installing Zeta, there are two steps that must be taken to ensure two users exist and are in sync across the nodes"
 echo "The two users are:"
 echo ""
 echo "mapr - This user is installed by the mapr installer and used for mapr services, however, we need to change the password and sync the password across the nodes"
 echo "zetaadm - This is the user you can use to administrate your cluster and install packages etc."
 echo ""
-echo "Please keep track of these users passwords"
+echo "Please keep track of these users' passwords"
 echo ""
 echo ""
+# TODO: remove this first question and rely on the while statement to ask the questions
 echo "Syncing mapr password on all nodes"
 stty -echo
 printf "Please enter new password for mapr user on all nodes: "
@@ -80,6 +88,7 @@ read mapr_PASS2
 echo ""
 stty echo
 
+# If the passwords don't match, keep asking for passwords until they do
 while [ "$mapr_PASS1" != "$mapr_PASS2" ]
 do
     echo "Passwords entered for mapr user do not match, please try again"
@@ -93,6 +102,7 @@ do
     stty echo
 done
 
+# TODO: remove this first question and rely on the while statement to ask the questions
 echo ""
 echo "Adding user zetaadm to all nodes"
 stty -echo
@@ -105,7 +115,7 @@ read zetaadm_PASS2
 echo ""
 stty echo
 
-
+# If the passwords don't match, keep asking for passwords until they do
 while [ "$zetaadm_PASS1" != "$zetaadm_PASS2" ]
 do
     echo "Passwords for zetaadm do not match, please try again"
@@ -122,6 +132,7 @@ do
 done
 
 
+# TODO: Do we want any user to be able to do passwordless sudo? Maybe just the current user?
 echo ""
 echo "Updating Sudoers to not require TTY per Ubuntu"
 for HOST in $HOSTS; do
@@ -129,6 +140,7 @@ for HOST in $HOSTS; do
   ssh -t -t -n -o StrictHostKeyChecking=no $HOST "sudo sed -i \"s/Defaults   \!visiblepw//g\" /etc/sudoers"
 done
 
+# Create the script that will be executed on each machine to add the users
 echo ""
 echo "Creating User Update Script"
 
@@ -183,6 +195,8 @@ fi
 EOF
 chmod 700 $SCRIPTSRC
 
+# Copy the script over to each node and execute it, removing it after the work is done
+# TODO: Verify that the script worked on each node?
 echo "Creating Users"
 for HOST in $HOSTS; do
   scp -o StrictHostKeyChecking=no $SCRIPTSRC $HOST:$SCRIPT
@@ -193,7 +207,8 @@ done
 rm $SCRIPTSRC
 
 ####################
-# Saving creds for later 
+# Saving creds for later
+# TODO: Change how this is stored/handled
 echo "Saving Creds"
 sudo mkdir -p /home/zetaadm/creds
 
@@ -227,7 +242,7 @@ if [ "$PRIVT" != "" ]; then
             CREATE=0
         fi
     else
-        echo "$PRIVLOC found on this node, but $PUBLOC not found. Will cowardly refused to create new keypair"
+        echo "$PRIVLOC found on this node, but $PUBLOC not found. Will cowardly refuse to create new keypair"
         exit 0
     fi
 fi
@@ -251,6 +266,7 @@ fi
 
 PUB=$(sudo cat $PUBLOC)
 
+# Add the keys on each node
 for HOST in $HOSTS; do
     echo "Updating Authorized Keys on $HOST"
     ssh -o StrictHostKeyChecking=no $HOST "sudo mkdir -p /home/zetaadm/.ssh && echo \"$PUB\"|sudo tee -a /home/zetaadm/.ssh/authorized_keys && sudo chown -R zetaadm:zetaadm /home/zetaadm/.ssh && sudo chmod 700 /home/zetaadm/.ssh && sudo chmod 600 /home/zetaadm/.ssh/authorized_keys"
