@@ -20,6 +20,25 @@ if [ ! -f "./ip_detect.sh" ]; then
     exit 1
 fi
 
+mkdir -p ./mapr_defaults
+mkdir -p ./mapr_defaults/conf
+rm ./mapr_defaults/conf/*
+
+if [ ! -f "./mapr_defaults/zk_default.tgz" ]; then
+    echo "Missing zk defaults. Grabbing from a container now"
+
+    CID=$(sudo docker run -d ${DOCKER_REG_URL}/zkdocker sleep 15)
+
+    sudo docker cp ${CID}:/opt/mapr/zookeeper/zookeeper-3.4.5/conf ./mapr_defaults
+    sudo chown zetaadm:zetaadm ./mapr_defaults/conf/*
+
+    cd mapr_defaults
+    cd conf
+    tar zcf ../zk_default.tgz ./*
+    cd ..
+    cd ..
+fi
+
 OLDIFS=$IFS
 IFS=","
 
@@ -50,6 +69,44 @@ for ZK in $ZK_STRING; do
 done
 IFS=$OLDIFS
 
+
+
+echo "Creating zoo.cfg"
+ZKOUT=$(echo -n $ZOOCFG|tr " " "\n")
+sudo tee ./zk_marathon/zoo.cfg << EOL1
+# The number of milliseconds of each tick
+tickTime=2000
+# The number of ticks that the initial
+# synchronization phase can take
+initLimit=20
+# The number of ticks that can pass between
+# sending a request and getting an acknowledgement
+syncLimit=10
+# the directory where the snapshot is stored.
+dataDir=/opt/mapr/zkdata
+# the port at which the clients will connect
+clientPort=$ZK_CLIENT_PORT
+# max number of client connections
+maxClientCnxns=100
+#autopurge interval - 24 hours
+autopurge.purgeInterval=24
+#superuser to allow zk nodes delete
+superUser=$MUSER
+#readuser to allow read zk info for authenticated clients
+readUser=anyone
+# cldb key location
+mapr.cldbkeyfile.location=/opt/mapr/conf/cldb.key
+#security provider name
+authMech=SIMPLE-SECURITY
+# security auth provider
+authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+# use maprserverticket not userticket for auth
+mapr.usemaprserverticket=true
+$ZKOUT
+EOL1
+
+
+
 echo "Ok, setting up the data locations on each node"
 IFS=","
 for ZK in $ZK_STRING; do
@@ -62,8 +119,19 @@ for ZK in $ZK_STRING; do
     ssh $ZK_HOST "sudo mkdir -p ${MAPR_INST}/conf && sudo chown mapr:mapr ${MAPR_INST}/conf && sudo chmod 755 ${MAPR_INST}/conf"
     echo "Creating zkdata location and setting myid"
     ssh $ZK_HOST "sudo mkdir -p ${MAPR_INST}/zkdata && echo $ZK_ID|sudo tee ${MAPR_INST}/zkdata/myid && sudo chown -R mapr:mapr ${MAPR_INST}/zkdata && sudo chmod 750 ${MAPR_INST}/zkdata"
-    echo "Creating log location on the host"
-    ssh $ZK_HOST "sudo mkdir -p ${MAPR_INST}/zookeeper/logs && sudo chown -R mapr:mapr ${MAPR_INST}/zookeeper && sudo chmod 777 ${MAPR_INST}/zookeeper/logs"
+    echo "Creating ZK conf and log location on the host"
+    ssh $ZK_HOST "sudo mkdir -p ${MAPR_INST}/zookeeper/logs && sudo mkdir -p ${MAPR_INST}/zookeeper/conf"
+
+    echo "Copying zk defaults and cfg to $ZK_HOST"
+    scp ./mapr_defaults/zk_default.tgz $ZK_HOST:/home/$IUSER/
+    scp ./zk_marathon/zoo.cfg $ZK_HOST:/home/$IUSER/
+
+    echo ""
+    echo "Unpacking and copying conf"
+    ssh $ZK_HOST "sudo mv /home/$IUSER/zk_default.tgz ${MAPR_INST}/zookeeper/conf/ && sudo tar zxf ${MAPR_INST}/zookeeper/conf/zk_default.tgz -C ${MAPR_INST}/zookeeper/conf && sudo rm ${MAPR_INST}/zookeeper/conf/zk_default.tgz"
+    ssh $ZK_HOST "sudo mv /home/$IUSER/zoo.cfg ${MAPR_INST}/zookeeper/conf/"
+    ssh $ZK_HOST "sudo chown -R mapr:mapr ${MAPR_INST}/zookeeper && sudo chmod 777 ${MAPR_INST}/zookeeper/logs"
+
 
     echo "Creating marathon scripts"
     mkdir -p ./zk_marathon
@@ -99,6 +167,7 @@ for ZK in $ZK_STRING; do
     "volumes": [
       { "containerPath": "/opt/mapr/conf", "hostPath": "${MAPR_INST}/conf", "mode": "RW" },
       { "containerPath": "/opt/mapr/zookeeper/zookeeper-3.4.5/logs", "hostPath": "${MAPR_INST}/zookeeper/logs", "mode": "RW" },
+      { "containerPath": "/opt/mapr/zookeeper/zookeeper-3.4.5/conf", "hostPath": "${MAPR_INST}/zookeeper/conf", "mode": "RW" },
       { "containerPath": "/opt/mapr/zkdata", "hostPath": "${MAPR_INST}/zkdata", "mode": "RW" }
     ]
   }
