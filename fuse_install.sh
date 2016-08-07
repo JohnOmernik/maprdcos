@@ -140,6 +140,42 @@ ssh $NODE_HOST "echo \"$NODE_HOST-fuse\"|sudo tee /opt/mapr/hostname"
 ssh $NODE_HOST "sudo /opt/mapr/server/configure.sh -N $CLUSTERNAME -c -C $CLDBS"
 ssh $NODE_HOST "sudo mkdir -p /mapr"
 ssh $NODE_HOST "sudo $INST_CMD $INST_POSIX"
+
+
+tee /tmp/fs_core.xml << EOL1
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+<configuration>
+  <property>
+    <name>fs.mapr.shmpool.size</name>
+    <value>0</value>
+  </property>
+</configuration>
+EOL1
+
+scp /tmp/fs_core.xml $NODE_HOST:/home/$IUSER/
+
+rm /tmp/fs_core.xml
+
+CORE_DST="/opt/mapr/hadoop/hadoop-2.7.0/etc/hadoop/core-site.xml"
+
+ssh $NODE_HOST "sudo mv /home/$IUSER/fs_core.xml $CORE_DST && sudo chown mapr:root $CORE_DST && sudo chmod 644 $CORE_DST"
+
 ssh $NODE_HOST "sudo /etc/init.d/mapr-posix-client-basic start"
 echo ""
 echo "Installed - ls /mapr/$CLUSTERNAME"
