@@ -90,6 +90,8 @@ RUN adduser --disabled-login --gecos '' --uid=2000 mapr
 RUN echo "$MAPR_CRED"|chpasswd
 RUN echo "$ZETA_CRED"|chpasswd
 
+RUN groupadd --gid 2501 zetausers && usermod -a -G zetausers mapr && usermod -a -G zetausers zetaadm
+
 RUN usermod -a -G root mapr && usermod -a -G root zetaadm && usermod -a -G adm mapr && usermod -a -G adm zetaadm && usermod -a -G disk mapr && usermod -a -G disk zetaadm
 
 RUN echo "deb http://package.mapr.com/releases/v5.1.0/ubuntu/ mapr optional" > /etc/apt/sources.list.d/mapr.list
