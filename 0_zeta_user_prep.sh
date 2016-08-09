@@ -18,7 +18,7 @@ IUSER=$(whoami)
 
 ZETA_ID="2500"
 MAPR_ID="2000"
-
+ZETAUSERS_GID="2501"
 HOSTS=$1
 
 # Make sure that we have a list of hosts to use, if not, exit
@@ -140,6 +140,9 @@ for HOST in $HOSTS; do
   ssh -t -t -n -o StrictHostKeyChecking=no $HOST "sudo sed -i \"s/Defaults   \!visiblepw//g\" /etc/sudoers"
 done
 
+
+
+
 # Create the script that will be executed on each machine to add the users
 echo ""
 echo "Creating User Update Script"
@@ -203,6 +206,9 @@ for HOST in $HOSTS; do
   ssh -o StrictHostKeyChecking=no $HOST "chmod 700 $SCRIPT"
   ssh -o StrictHostKeyChecking=no $HOST "sudo $SCRIPT"
   ssh -o StrictHostKeyChecking=no $HOST "sudo rm $SCRIPT"
+  ssh $HOST "sudo groupadd --gid $ZETAUSERS_GID zetausers"
+  ssh $HOST "sudo usermod -a -G zetausers mapr"
+  ssh $HOST "sudo usermod -a -G zetausers zetaadm"
 done
 rm $SCRIPTSRC
 
