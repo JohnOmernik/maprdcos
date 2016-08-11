@@ -102,10 +102,10 @@ STARTED=""
 
 for CLDB in $CLDBS; do
     CLDB_HOST=$(echo $CLDB|cut -d":" -f1)
-    CLDB_MARATHON="./cldb_marathon/mapr_cldb_$CLDB_HOST.marathon"
     STARTED="$STARTED $CLDB_HOST"
-    echo "Submitting $CLDB_HOST via $CLDB_MARATHON at $MARATHON_SUBMIT"
-    curl -X POST $MARATHON_SUBMIT -d @$CLDB_MARATHON -H "Content-type: application/json"
+
+    ./start_mapr_node.sh $CLDB_HOST
+
 done
 echo ""
 echo ""
@@ -118,10 +118,7 @@ for NODE in $INODES; do
     NODE_HOST=$(echo $NODE|cut -d":" -f1)
     CHK=$(echo $STARTED|grep $NODE_HOST)
     if [ "$CHK" == "" ]; then
-        NODE_MARATHON="./stdnode_marathon/mapr_std_${NODE_HOST}.marathon"
-        echo "$NODE_HOST not started. Starting now!"
-        echo "Submitted $NODE_HOST via $NODE_MARATHON at $MARATHON_SUBMIT"
-        curl -X POST $MARATHON_SUBMIT -d @$NODE_MARATHON -H "Content-type: application/json"
+        ./start_mapr_node.sh $NODE_HOST
     fi
 done
 
