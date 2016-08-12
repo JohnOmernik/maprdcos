@@ -176,6 +176,10 @@ CORE_DST="/opt/mapr/hadoop/hadoop-2.7.0/etc/hadoop/core-site.xml"
 
 ssh $NODE_HOST "sudo mv /home/$IUSER/fs_core.xml $CORE_DST && sudo chown mapr:root $CORE_DST && sudo chmod 644 $CORE_DST"
 
+ssh $NODE_HOST "echo \". /opt/mapr/conf/env.sh\"|sudo tee -a /opt/mapr/initscripts/mapr-posix-client-basic"
+
+ssh $NODE_HOST "sudo sed -i '/# Look for installed JDK/ i . \${BASEMAPR}/conf/env.sh' /opt/mapr/initscripts/mapr-fuse"
+
 ssh $NODE_HOST "sudo /etc/init.d/mapr-posix-client-basic start"
 echo ""
 echo "Installed - ls /mapr/$CLUSTERNAME"
