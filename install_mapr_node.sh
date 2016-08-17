@@ -271,10 +271,6 @@ echo "Total MapR Mem Required: $MARATHON_MEM"
 echo ""
 echo "Creating Marathon Files"
 
-mkdir -p ./cldb_marathon
-mkdir -p ./stdnode_marathon
-
-
 
 
 cat > $MARFILE << MAREOF

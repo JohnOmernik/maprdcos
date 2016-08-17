@@ -22,6 +22,7 @@ fi
 
 mkdir -p ./mapr_defaults
 mkdir -p ./mapr_defaults/conf
+mkdir -p ./zk_marathon
 rm ./mapr_defaults/conf/*
 
 if [ ! -f "./mapr_defaults/zk_default.tgz" ]; then
@@ -73,7 +74,7 @@ IFS=$OLDIFS
 
 echo "Creating zoo.cfg"
 ZKOUT=$(echo -n $ZOOCFG|tr " " "\n")
-sudo tee ./zk_marathon/zoo.cfg << EOL1
+tee ./zk_marathon/zoo.cfg << EOL1
 # The number of milliseconds of each tick
 tickTime=2000
 # The number of ticks that the initial
@@ -134,7 +135,6 @@ for ZK in $ZK_STRING; do
 
 
     echo "Creating marathon scripts"
-    mkdir -p ./zk_marathon
 
     MFILE="./zk_marathon/mapr_zk_${ZK_HOST}.marathon"
 

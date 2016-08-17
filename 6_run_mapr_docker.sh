@@ -45,6 +45,8 @@ fi
 mkdir -p ./mapr_defaults
 mkdir -p ./mapr_defaults/conf
 mkdir -p ./mapr_defaults/roles
+mkdir -p ./cldb_marathon
+mkdir -p ./stdnode_marathon
 rm ./mapr_defaults/conf/*
 rm ./mapr_defaults/roles/*
 
