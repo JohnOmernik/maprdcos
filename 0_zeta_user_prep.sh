@@ -138,7 +138,7 @@ done
 # TODO: Do we want any user to be able to do passwordless sudo? Maybe just the current user?
 echo ""
 echo "Updating Sudoers to not require TTY per Ubuntu"
-for HOST in $HOSTS; do
+for HOST in $CHOSTS; do
   ssh -t -t -n -o StrictHostKeyChecking=no $HOST "sudo sed -i \"s/Defaults    requiretty//g\" /etc/sudoers"
   ssh -t -t -n -o StrictHostKeyChecking=no $HOST "sudo sed -i \"s/Defaults   \!visiblepw//g\" /etc/sudoers"
 done
@@ -204,7 +204,7 @@ chmod 700 $SCRIPTSRC
 # Copy the script over to each node and execute it, removing it after the work is done
 # TODO: Verify that the script worked on each node?
 echo "Creating Users"
-for HOST in $HOSTS; do
+for HOST in $CHOSTS; do
   scp -o StrictHostKeyChecking=no $SCRIPTSRC $HOST:$SCRIPT
   ssh -o StrictHostKeyChecking=no $HOST "chmod 700 $SCRIPT"
   ssh -o StrictHostKeyChecking=no $HOST "sudo $SCRIPT"
@@ -276,7 +276,7 @@ fi
 PUB=$(sudo cat $PUBLOC)
 
 # Add the keys on each node
-for HOST in $HOSTS; do
+for HOST in $CHOSTS; do
     echo "Updating Authorized Keys on $HOST"
     ssh -o StrictHostKeyChecking=no $HOST "sudo mkdir -p /home/zetaadm/.ssh && echo \"$PUB\"|sudo tee -a /home/zetaadm/.ssh/authorized_keys && sudo chown -R zetaadm:zetaadm /home/zetaadm/.ssh && sudo chmod 700 /home/zetaadm/.ssh && sudo chmod 600 /home/zetaadm/.ssh/authorized_keys"
 done
