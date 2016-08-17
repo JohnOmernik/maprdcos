@@ -45,7 +45,10 @@ echo ""
 echo "-------------------------------------------------------------------"
 echo "Status of requested Nodes. If root is listed, permissions are setup correctly"
 echo "-------------------------------------------------------------------"
-for HOST in $HOSTS; do
+
+CHOSTS=$(echo "$HOSTS"|tr "," " ")
+
+for HOST in $CHOSTS; do
     OUT=$(ssh -t -t -n -o StrictHostKeyChecking=no $HOST "sudo whoami" 2> /dev/null)
     echo "$HOST     $OUT"
 done
