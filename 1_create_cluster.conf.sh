@@ -203,7 +203,24 @@ read -p "Marathon Host: " -e -i "marathon.mesos:8080" MARATHON
 echo ""
 echo ""
 
+echo ""
+echo "---------------------------------------"
+echo "We can install LDAP into the MapR Docker containers from the start. We recommend this."
+echo "If you choose Y here, we ask you some information about your LDAP env"
+echo "You can use an enterprise LDAP here, or you can use the defaults. Once MapR is up and running, we can install open ldap (in the zetadcos repo) for full support"
+echo "Do you want to install LDAP?"
+read -p "Install LDAP? " -e -i "Y" INSTALL_LDAP
 
+if [ "$INSTALL_LDAP" == "Y" ]; then
+    echo "Great, let's check what LDAP YOU want to use"
+    echo "Please enter the following information about your LDAP server. Use defaults for a zeta based open ldap server installed after MapR is installed"
+    read -p "LDAP URL: " -e -i "ldap://openldap.shared.marathon.mesos" LDAP_URL
+    read -p "LDAP Base: " -e -i "dc=marathon,dc=mesos" LDAP_BASE
+    read -p "LDAP RO User DN: " -e -i "cn=readonly,dc=marathon,dc=mesos" LDAP_RO_USER
+    read -p "LDAP RO User Password: " -e -i "readonly" LDAP_RO_PASS
+else
+    INSTALL_LDAP="N"
+fi
 
 cat > ./cluster.conf << EOF
 #!/bin/bash
@@ -267,6 +284,12 @@ export MUSER="$MAPR_USER"
 
 export MARATHON_HOST="$MARATHON"
 export MARATHON_SUBMIT="http://\$MARATHON_HOST/v2/apps"
+
+export INSTALL_LDAP="$INSTALL_LDAP"
+export LDAP_BASE="$LDAP_BASE"
+export LDAP_URL="$LDAP_URL"
+export LDAP_RO_USER="$LDAP_RO_USER"
+export LDAP_RO_PASS="$LDAP_RO_PASS"
 
 
 ########################################################################################################################################################################################################
