@@ -22,6 +22,21 @@ if [ ! -f "./ip_detect.sh" ]; then
 fi
 
 
+echo ""
+echo "*********************************************************"
+echo "Due to an issue with the Loopback client (https://github.com/JohnOmernik/maprdcos/issues/30) we are validating you wish to install this."
+echo "NFS based actions will produce errors"
+echo "*********************************************************"
+echo ""
+read -e -p "Do you with to proceed with installing the LOOPBACK client? " -i "N" LOOP_INST
+
+if [ "$LOOP_INST" != "Y" ]; then
+   echo "Exiting loopback install"
+   exit 1
+fi
+
+
+
 UBUNTU_MAPR_LOOP_BASE="http://package.mapr.com/releases/v5.1.0/ubuntu/pool/optional/m/mapr-loopbacknfs/"
 UBUNTU_MAPR_LOOP_FILE="mapr-loopbacknfs_5.1.0.37549.GA-1_amd64.deb"
 
