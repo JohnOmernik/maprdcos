@@ -15,8 +15,10 @@ if [ ! -f "$PRVKEY" ]; then
     exit 1
 fi
 
-
 NODE_HOST=$1
+
+echo "This script is not functioning at this time"
+exit 1
 
 echo "Reconfigure Requested"
 echo "It is recommended that you update your cluster.conf and then issue this reconfigure"

@@ -20,6 +20,27 @@ if [ ! -f "./ip_detect.sh" ]; then
     exit 1
 fi
 
+IPDETECT_TEST=$(./ip_detect.sh)
+
+if [ "$IPDETECT_TEST" == "" ]; then
+    echo "It appears that eh ip_detect.sh located at /home/$IUSER didn't return anything for this node"
+    echo "It should likely be updated if you want the MapR installation to succeed"
+    echo "It should return the IP address of the primary interface on this cluster."
+else
+    echo "The ip_detect.sh script returned $IPDETECET_TEST"
+    echo "This should be the IP for the primary interface on this node, but it should work on all nodes the same way"
+    echo "If you are unsure if this is the case, exit here, and test on all nodes"
+fi
+
+echo ""
+echo "Based on the results of the ip_detect.sh, do you wish to go on?"
+read -e -P "Do the ip_detect.sh results look accurate? " -i "N" IPTEST
+
+if [ "$IPTEST" != "Y" ]; then
+    echo "Exiting due to ip_detect results"
+    exit 1
+fi
+
 mkdir -p ./mapr_defaults
 mkdir -p ./mapr_defaults/conf
 mkdir -p ./zk_marathon

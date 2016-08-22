@@ -21,6 +21,20 @@ if [ ! -f "./ip_detect.sh" ]; then
     exit 1
 fi
 
+echo ""
+echo "*********************************************************"
+echo "Due to an issue with the FUSE client (https://github.com/JohnOmernik/maprdcos/issues/31) we are validating you wish to install this."
+echo "The hadoop client will work, but NFS based actions will produce errors"
+echo "*********************************************************"
+echo ""
+read -e -p "Do you with to proceed with installing the fuse client? " -i "N" FUSE_INST
+
+if [ "$FUSE_INST" != "Y" ]; then
+   echo "Exiting fuse install"
+   exit 1
+fi
+
+
 
 
 
