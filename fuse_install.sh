@@ -25,6 +25,7 @@ echo ""
 echo "*********************************************************"
 echo "Due to an issue with the FUSE client (https://github.com/JohnOmernik/maprdcos/issues/31) we are validating you wish to install this."
 echo "The hadoop client will work, but NFS based actions will produce errors"
+echo "You can set this up only to install the hadoop client (no fuse client) by passing a 1 as the second argument to this script"
 echo "*********************************************************"
 echo ""
 read -e -p "Do you with to proceed with installing the fuse client? " -i "N" FUSE_INST
@@ -33,7 +34,6 @@ if [ "$FUSE_INST" != "Y" ]; then
    echo "Exiting fuse install"
    exit 1
 fi
-
 
 
 
@@ -49,6 +49,7 @@ RH_MAPR_POSIX_BASE="http://package.mapr.com/releases/v5.1.0/redhat/"
 RH_MAPR_POSIX_FILE="mapr-posix-client-basic-5.1.0.37549.GA-1.x86_64.rpm"
 
 NODE_HOST=$1
+CLIENT_ONLY=$2
 
 if [ "$NODE_HOST" == "" ]; then
     echo "This script must be passed a hostname"
@@ -155,7 +156,6 @@ ssh $NODE_HOST "sudo /opt/mapr/server/configure.sh -N $CLUSTERNAME -c -C $CLDBS"
 ssh $NODE_HOST "sudo mkdir -p /mapr"
 ssh $NODE_HOST "sudo $INST_CMD $INST_POSIX"
 
-
 tee /tmp/fs_core.xml << EOL1
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
@@ -194,9 +194,14 @@ ssh $NODE_HOST "echo \". /opt/mapr/conf/env.sh\"|sudo tee -a /opt/mapr/initscrip
 
 ssh $NODE_HOST "sudo sed -i '/# Look for installed JDK/ i . \${BASEMAPR}/conf/env.sh' /opt/mapr/initscripts/mapr-fuse"
 
-ssh $NODE_HOST "sudo /etc/init.d/mapr-posix-client-basic start"
+if [ "$CLIENT_ONLY" != "1" ]; then
+    ssh $NODE_HOST "sudo /etc/init.d/mapr-posix-client-basic start"
+    echo "NFS Mount: "
+    ssh $NODE_HOST "ls -ls /mapr/$CLUSTERNAME"
+fi
 echo ""
 echo "Installed - ls /mapr/$CLUSTERNAME"
 echo ""
-ssh $NODE_HOST "ls -ls /mapr/$CLUSTERNAME"
+echo "hadoop fs:"
+ssh $NODE_HOST "hadoop fs -ls /"
 
