@@ -21,22 +21,6 @@ if [ ! -f "./ip_detect.sh" ]; then
     exit 1
 fi
 
-echo ""
-echo "*********************************************************"
-echo "Due to an issue with the FUSE client (https://github.com/JohnOmernik/maprdcos/issues/31) we are validating you wish to install this."
-echo "The hadoop client will work, but NFS based actions will produce errors"
-echo "You can set this up only to install the hadoop client (no fuse client) by passing a 1 as the second argument to this script"
-echo "*********************************************************"
-echo ""
-read -e -p "Do you with to proceed with installing the fuse client? " -i "N" FUSE_INST
-
-if [ "$FUSE_INST" != "Y" ]; then
-   echo "Exiting fuse install"
-   exit 1
-fi
-
-
-
 
 UBUNTU_MAPR_CLIENT_BASE="http://package.mapr.com/releases/v5.1.0/ubuntu/pool/optional/m/mapr-client/"
 UBUNTU_MAPR_CLIENT_FILE="mapr-client_5.1.0.37549.GA-1_amd64.deb"
@@ -156,49 +140,13 @@ ssh $NODE_HOST "sudo /opt/mapr/server/configure.sh -N $CLUSTERNAME -c -C $CLDBS"
 ssh $NODE_HOST "sudo mkdir -p /mapr"
 ssh $NODE_HOST "sudo $INST_CMD $INST_POSIX"
 
-tee /tmp/fs_core.xml << EOL1
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-<!--
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License. See accompanying LICENSE file.
--->
-
-<!-- Put site-specific property overrides in this file. -->
-<configuration>
-  <property>
-    <name>fs.mapr.shmpool.size</name>
-    <value>0</value>
-  </property>
-</configuration>
-EOL1
-
-scp /tmp/fs_core.xml $NODE_HOST:/home/$IUSER/
-
-rm /tmp/fs_core.xml
-
-CORE_DST="/opt/mapr/hadoop/hadoop-2.7.0/etc/hadoop/core-site.xml"
-
-ssh $NODE_HOST "sudo mv /home/$IUSER/fs_core.xml $CORE_DST && sudo chown mapr:root $CORE_DST && sudo chmod 644 $CORE_DST"
-
 ssh $NODE_HOST "echo \". /opt/mapr/conf/env.sh\"|sudo tee -a /opt/mapr/initscripts/mapr-posix-client-basic"
 
 ssh $NODE_HOST "sudo sed -i '/# Look for installed JDK/ i . \${BASEMAPR}/conf/env.sh' /opt/mapr/initscripts/mapr-fuse"
+ssh $NODE_HOST "sudo /etc/init.d/mapr-posix-client-basic start"
+echo "NFS Mount: "
+ssh $NODE_HOST "ls -ls /mapr/$CLUSTERNAME"
 
-if [ "$CLIENT_ONLY" != "1" ]; then
-    ssh $NODE_HOST "sudo /etc/init.d/mapr-posix-client-basic start"
-    echo "NFS Mount: "
-    ssh $NODE_HOST "ls -ls /mapr/$CLUSTERNAME"
-fi
 echo ""
 echo "Installed - ls /mapr/$CLUSTERNAME"
 echo ""
