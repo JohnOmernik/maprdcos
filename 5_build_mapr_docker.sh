@@ -30,12 +30,14 @@ service rpcbind start
 if [ ! -f "/opt/mapr/conf/mapr-clusters.conf" ]; then
     echo "No mapr-clusters.conf found - Assuming New Install Running Config based on settings"
     /opt/mapr/server/mruuidgen > /opt/mapr/hostid
-    cat /opt/mapr/hostid > /opt/mapr/conf/hostid.\$\$
+    cat /opt/mapr/hostid > /opt/mapr/conf/hostid.init
     sed -i 's/AddUdevRules(list/#AddUdevRules(list/' /opt/mapr/server/disksetup
-
     /opt/mapr/server/configure.sh -C \${CLDBS} -Z \${ZKS} -F /opt/mapr/conf/initial_disks.txt -N \${CLUSTERNAME} -u \${MUSER} -g \${MUSER} -no-autostart \${MAPR_CONF_OPTS}
 else
     echo "mapr-clusters.conf found, running warden"
+    sed -i 's/AddUdevRules(list/#AddUdevRules(list/' /opt/mapr/server/disksetup
+    cat /opt/mapr/conf/hostid.init > /opt/mapr/hostid
+    /opt/mapr/server/configure.sh -R
 fi
 
 /opt/mapr/server/dockerwarden.sh

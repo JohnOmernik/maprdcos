@@ -297,6 +297,9 @@ cat > $MARFILE << MAREOF
     "docker": {
       "image": "${DOCKER_REG_URL}/maprdocker",
       "privileged": true,
+      "parameters": [
+                { "key": "ipc", "value": "host" }
+            ],
       "network": "HOST"
     },
     "volumes": [
