@@ -2,8 +2,6 @@
 ---------------------
 This repo allows a (non-standard DCOS) install of MapR running in Docker on a DCOS cluster. 
 
-
-
 ## Prereqs
 ---------------------
 This assumes some things about your cluster
@@ -12,8 +10,17 @@ This assumes some things about your cluster
 - The nodes have a couple of local users configured
     - zetaadm - UID 2500 (the UID can be changed, it just has to be the same on all nodes)
     - mapr - UID 2000 (the UID can be changed, it just has to be the same on all nodes)
-    - There is script included here that will install the users for you (It adds them to the sudoers group and also updates a SSH key for zetaadm user) (zeta_user_prep.sh)
+    - There is script included here that will install the users for you (It adds them to the sudoers group and also updates a SSH key for zetaadm user) (0_zeta_user_prep.sh)
 - Docker is installed on all node (This should be done as prereq for the DCOS install)
+    - For this, we recommend making your life easier by setting up some insecure registries upfront. We want to get a cert store going, however at this time, we only have insecure registries. 
+    - To do this: on each node, create a file at for docker systemd overrides (this can be done prior to installing Docker):
+    - $ sudo mkdir -p /etc/systemd/system/docker.service.d && sudo touch /etc/systemd/system/docker.service.d/override.conf
+    - In that file it it should read:
+
+[Service]
+ExecStart=
+ExecStart=/user/bin/docker daemon --storage-driver=overlay --insecure-registry=maprdocker.mapr.marathon.mesos:5000 --insecure-registry=dockerregv2.shared.marathon.mesos:5005 -h fd://
+
 - I did this on a non-standard Ubuntu 16.04 install of DCOS.  Everything worked, but this is not supported by Mesosphere at this time. 
     - The only thing I updated was a systemd conf file - systemd - edit /etc/systemd/system.conf - set DefaultTasksMax=infinity
     - and updated some links prior to DCOS install: Use Ubuntu at your own risk, however I found CentOS/RH annoying trying to use Overlay FS in Docker
@@ -23,7 +30,6 @@ This assumes some things about your cluster
     - sudo ln -s /bin/tar /usr/bin/tar
 - In addition to the changes for Ubuntu above, I added a few packages to every node/master. This was in order to help this mapr install
     - sudo apt-get install bc nfs-common syslinux
-
 
 
 ## Current Issues:
