@@ -36,7 +36,7 @@ sudo docker tag registry:2 zeta/registry:2
 
 cat > maprdocker.marathon << EOF
 {
-  "id": "mapr/maprdocker",
+  "id": "shared/mapr/maprdocker",
   "cpus": 1,
   "mem": 1024,
   "instances": 1,

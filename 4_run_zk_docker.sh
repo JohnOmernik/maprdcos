@@ -165,7 +165,7 @@ for ZK in $ZK_STRING; do
 
     cat > $MFILE << EOFZK
 {
-  "id": "mapr/zks/zk${ZK_HOST}",
+  "id": "shared/mapr/zks/zk${ZK_HOST}",
   "cpus": 1,
   "mem": 1536,
   "cmd": "/opt/mapr/runzkdocker.sh",
