@@ -25,13 +25,11 @@ if [ ! -f "./install_mapr_node.sh" ]; then
     echo "I can't find the install_mapr_node.sh script. Something is really wrong here"
     exit 1
 fi
-#DOCKER_REG_HOST=maprdocker.mapr.marathon.mesos
 #ZK_STRING=0:zeta2,1:zeta4,2:zeta5
 #CLDBS=zeta2:7222,zeta4:7222
 #ZK_MASTER_ELECTION_PORT=2880
 #INODES=zeta2:/dev/sdc,/dev/sdd,/dev/sde,/dev/sdf;zeta4:/dev/sda,/dev/sdb,/dev/sdc,/dev/sdd,/dev/sde,/dev/sdf,/dev/sdg,/dev/sdh,/dev/sdi,/dev/sdj,/dev/sdk,/dev/sdl
 #ZK_CLIENT_PORT=5181
-#DOCKER_REG_URL=maprdocker.mapr.marathon.mesos:5000
 #ZKS=zeta2:5181,zeta4:5181,zeta5:5181
 #MUSER=mapr
 #ZOOCFG=server.0=zeta2:3880:2880 server.1=zeta4:3880:2880 server.2=zeta5:3880:2880

@@ -19,7 +19,7 @@ This assumes some things about your cluster
 ~~~~
 [Service]
 ExecStart=
-ExecStart=/user/bin/docker daemon --storage-driver=overlay --insecure-registry=maprdocker.mapr.marathon.mesos:5000 --insecure-registry=dockerregv2.shared.marathon.mesos:5005 -h fd://
+ExecStart=/user/bin/docker daemon --storage-driver=overlay --insecure-registry=maprdocker-mapr-shared.marathon.agentip.dcos.thisdcos.directory:5000 --insecure-registry=dockerregv2-shared.marathon.agentip.dcos.thisdcos.directory:5005 -h fd://
 ~~~~
 - I did this on a non-standard Ubuntu 16.04 install of DCOS.  Everything worked, but this is not supported by Mesosphere at this time. 
     - The only thing I updated was a systemd conf file - systemd - edit /etc/systemd/system.conf - set DefaultTasksMax=infinity

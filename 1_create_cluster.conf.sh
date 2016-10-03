@@ -64,9 +64,9 @@ echo "---------------------------------------"
 
 echo "As we build the docker containers, we need a temporary Docker registry to host the containers"
 echo "This is ONLY for mapr based containers" 
-echo "It will be named maprdocker.mapr.marathon.mesos by default, only change this name if you understand what that means"
+echo "It will be named maprdocker-mapr-shared.marathon.agentip.dcos.thisdcos.directory by default, only change this name if you understand what that means"
 echo "Which host do you wish to run it on?" 
-read -p "Docker Registry Host: " -e -i "maprdocker.mapr.marathon.mesos" DOCKER_REG_HOST
+read -p "Docker Registry Host: " -e -i "maprdocker-mapr-shared.marathon.agentip.dcos.thisdcos.directory" DOCKER_REG_HOST
 read -p "Which port should the docker register run on (we recommend 5000): " -e -i "5000" DOCKER_REG_PORT
 echo ""
 echo ""
@@ -77,7 +77,7 @@ echo ""
 echo "sudo mkdir -p /etc/systemd/system/docker.service.d && sudo tee /etc/systemd/system/docker.service.d/override.conf <<- EOF"
 echo "[Service]"
 echo "ExecStart="
-echo "ExecStart=/usr/bin/docker daemon --storage-driver=overlay --insecure-registry=maprdocker.mapr.marathon.mesos:5000 -H fd://"
+echo "ExecStart=/usr/bin/docker daemon --storage-driver=overlay --insecure-registry=maprdocker-mapr-shared.marathon.agentip.dcos.thisdcos.directory:5000 --insecure-registry=dockerregv2-shared.marathon.agentip.dcos.thisdcos.directory:5005 -H fd://"
 echo "EOF"
 echo ""
 echo "sudo systemctl daemon-reload"
@@ -85,7 +85,7 @@ echo "sudo service docker restart"
 echo ""
 echo "Now, if you already have override.conf. The key part you need to add to the ExecStart line is:"
 echo ""
-echo "--insecure-registry=maprdocker.mapr.marathon.mesos:5000"
+echo "--insecure-registry=maprdocker-mapr-shared.marathon.agentip.dcos.thisdcos.directory:5000"
 echo ""
 echo "Then:"
 echo "sudo systemctl daemon-reload"
@@ -214,7 +214,7 @@ read -p "Install LDAP? " -e -i "Y" INSTALL_LDAP
 if [ "$INSTALL_LDAP" == "Y" ]; then
     echo "Great, let's check what LDAP YOU want to use"
     echo "Please enter the following information about your LDAP server. Use defaults for a zeta based open ldap server installed after MapR is installed"
-    read -p "LDAP URL: " -e -i "ldap://openldap.shared.marathon.mesos" LDAP_URL
+    read -p "LDAP URL: " -e -i "ldap://openldap.shared.marathon.agentip.dcos.thisdcos.directory" LDAP_URL
     read -p "LDAP Base: " -e -i "dc=marathon,dc=mesos" LDAP_BASE
     read -p "LDAP RO User DN: " -e -i "cn=readonly,dc=marathon,dc=mesos" LDAP_RO_USER
     read -p "LDAP RO User Password: " -e -i "readonly" LDAP_RO_PASS

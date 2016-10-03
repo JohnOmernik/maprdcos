@@ -172,11 +172,11 @@ if [ "$CONTROL_CHK" == "" ]; then
     ssh $NODE_HOST "sudo rm ${MAPR_INST}/roles/cldb"
     ssh $NODE_HOST "sudo rm ${MAPR_INST}/roles/webserver"
     MARFILE="./stdnode_marathon/mapr_std_${NODE_HOST}.marathon"
-    MARID="mapr/stdnodes/std${NODE_HOST}"
+    MARID="shared/mapr/stdnodes/std${NODE_HOST}"
     MARATHON_CPUS=1
 else
     MARFILE="./cldb_marathon/mapr_cldb_${NODE_HOST}.marathon"
-    MARID="mapr/cldbs/cldb${NODE_HOST}"
+    MARID="shared/mapr/cldbs/cldb${NODE_HOST}"
     MARATHON_CPUS=2
 fi
 
