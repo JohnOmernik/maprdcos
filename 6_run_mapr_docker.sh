@@ -111,6 +111,8 @@ echo ""
 echo ""
 echo "Waiting 30 seconds to let the CLDBs Start"
 sleep 30
+echo "At this point, please check to determine if CLDB is running, if it is, please press enter"
+read -e -p "I solemnly swear I checked to ensure the CLDB was running: " -i "YES" CHKMATE
 
 IFS=";"
 
