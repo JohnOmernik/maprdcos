@@ -35,7 +35,7 @@ echo "This may not address your network, so please, review this script and edit 
 
 cat > ./ip_detect.sh << EOFIP
 #!/bin/bash
-
+. /etc/profile
 INTS="eth0 em1 eno1 enp2s0 enp3s0 ens192"
 
 for INT in \$INTS; do
