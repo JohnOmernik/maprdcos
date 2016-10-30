@@ -49,7 +49,7 @@ rm ./mapr_defaults/conf/*
 if [ ! -f "./mapr_defaults/zk_default.tgz" ]; then
     echo "Missing zk defaults. Grabbing from a container now"
 
-    CID=$(sudo docker run -d ${DOCKER_REG_URL}/zkdocker sleep 15)
+    CID=$(sudo docker run -d ${DOCKER_REG_URL}/zkdocker:${MAPR_DOCKER_TAG} sleep 15)
 
     sudo docker cp ${CID}:/opt/mapr/zookeeper/zookeeper-3.4.5/conf ./mapr_defaults
     sudo chown zetaadm:zetaadm ./mapr_defaults/conf/*
@@ -182,7 +182,7 @@ for ZK in $ZK_STRING; do
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "${DOCKER_REG_URL}/zkdocker",
+      "image": "${DOCKER_REG_URL}/zkdocker:${MAPR_DOCKER_TAG}",
       "network": "HOST"
     },
     "volumes": [

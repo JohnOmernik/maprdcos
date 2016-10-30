@@ -16,24 +16,30 @@ if [ ! -f "$PRVKEY" ]; then
 fi
 
 NODE_HOST=$1
-
+SHINY=$2
 
 OUT=$(echo $CLDBS|grep $NODE_HOST)
 
 if [ "$OUT" != "" ]; then
-    MARID="mapr/cldbs/cldb${NODE_HOST}"
+    MARID="shared/mapr/cldbs/cldb${NODE_HOST}"
     MARFILE="./cldb_marathon/mapr_cldb_${NODE_HOST}.marathon"
     NTYPE="CLDB"
 else
-    MARID="mapr/stdnodes/std${NODE_HOST}"
+    MARID="shared/mapr/stdnodes/std${NODE_HOST}"
     MARFILE="./stdnode_marathon/mapr_std_${NODE_HOST}.marathon"
     NTYPE="STD"
 fi
 
-
-echo "Are you sure you want to destroy the $NTYPE node at $NODE_HOST"
-echo "This is a bad thing"
-read -p "Destroy node? " -e -i "N" TEST
+if [ "$SHINY" == "" ]; then
+    echo "Are you sure you want to destroy the $NTYPE node at $NODE_HOST"
+    echo "This is a bad thing"
+    read -p "Destroy node? " -e -i "N" TEST
+elif [ "$SHINY" == "YEP" ]; then
+    TEST="Y"
+else
+  echo "I'm sorry, you need more SEKRIT"
+  TEST="N"
+fi
 
 if [ "$TEST" == "Y" ]; then
     echo "Good luck with that"

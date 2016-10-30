@@ -16,15 +16,24 @@ if [ ! -f "$PRVKEY" ]; then
 fi
 
 NODE_HOST=$1
-
+SHINY=$2
 
 MFILE="./zk_marathon/mapr_zk_${NODE_HOST}.marathon"
-MID="mapr/zks/zk${NODE_HOST}"
+MID="shared/mapr/zks/zk${NODE_HOST}"
 
 
-echo "Are you sure you want to destroy the zk at $NODE_HOST"
-echo "This is a bad thing"
-read -p "Destroy zk? " -e -i "N" TEST
+if [ "$SHINY" == "" ]; then
+    echo "Are you sure you want to destroy the zk at $NODE_HOST"
+    echo "This is a bad thing"
+    read -p "Destroy zk? " -e -i "N" TEST
+elif [ "$SHINY" == "YEP" ]; then
+    TEST="Y"
+else
+  echo "I'm sorry, you need more SEKRIT"
+  TEST="N"
+fi
+
+
 
 if [ "$TEST" == "Y" ]; then
     echo "Good luck with that"
