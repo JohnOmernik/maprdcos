@@ -51,7 +51,7 @@ rm ./mapr_defaults/roles/*
 if [ ! -f "./mapr_defaults/conf_default.tgz" ] || [ ! -f "./mapr_defaults/roles_default.tgz" ]; then
     echo "Missing roles or conf defaults. Grabbing from a container now"
 
-    CID=$(sudo docker run -d ${DOCKER_REG_URL}/maprdocker sleep 15)
+    CID=$(sudo docker run -d ${DOCKER_REG_URL}/maprdocker:$MAPR_DOCKER_TAG sleep 15)
 
     sudo docker cp ${CID}:/opt/mapr/conf ./mapr_defaults
     sudo docker cp ${CID}:/opt/mapr/roles ./mapr_defaults

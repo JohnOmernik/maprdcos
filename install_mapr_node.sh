@@ -295,7 +295,7 @@ cat > $MARFILE << MAREOF
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "${DOCKER_REG_URL}/maprdocker",
+      "image": "${DOCKER_REG_URL}/maprdocker:${MAPR_DOCKER_TAG}",
       "privileged": true,
       "parameters": [
                 { "key": "ipc", "value": "host" }

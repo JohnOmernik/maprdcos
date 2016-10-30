@@ -91,6 +91,15 @@ echo "Then:"
 echo "sudo systemctl daemon-reload"
 echo "sudo service docker restart"
 echo "**********************************************************"
+echo ""
+echo ""
+echo "Information about the MapR versions will be saved in cluster.conf, please review URLS for accuracy"
+
+
+
+
+
+
 
 
 echo ""
@@ -290,6 +299,24 @@ export LDAP_BASE="$LDAP_BASE"
 export LDAP_URL="$LDAP_URL"
 export LDAP_RO_USER="$LDAP_RO_USER"
 export LDAP_RO_PASS="$LDAP_RO_PASS"
+
+export MAPR_VER="v5.2.0"
+export MAPR_PATCH="39745"
+
+export MAPR_DOCKER_TAG="${MAPR_VER}-${MAPR_PATCH}"
+
+export MAPR_MAIN_URL="http://package.mapr.com/releases/v5.2.0/ubuntu/"
+export MAPR_ECOSYSTEM_URL="http://package.mapr.com/releases/ecosystem-5.x/ubuntu"
+
+
+export MAPR_PATCH_ROOT="http://archive.mapr.com/patches/archives/v5.2.0/ubuntu/dists/binary/"
+
+export MAPR_PATCH_FILE="mapr-patch-5.2.0.39122.GA-39745.x86_64.deb"
+export MAPR_CLIENT_PATCH_FILE="mapr-patch-client-5.2.0.39122.GA-39745.x86_64.deb"
+export MAPR_POSIX_PATCH_FILE="mapr-patch-posix-client-basic-5.2.0.39122.GA-39745.x86_64.deb"
+export MAPR_LOOP_PATCH_FILE="mapr-patch-loopbacknfs-5.2.0.39122.GA-39745.x86_64.deb"
+
+
 
 
 ########################################################################################################################################################################################################
