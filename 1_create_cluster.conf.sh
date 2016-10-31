@@ -310,7 +310,7 @@ export LDAP_RO_PASS="$LDAP_RO_PASS"
 export MAPR_VER="v5.2.0"
 export MAPR_PATCH="39745"
 
-export MAPR_DOCKER_TAG="${MAPR_VER}-${MAPR_PATCH}"
+export MAPR_DOCKER_TAG="\${MAPR_VER}-\${MAPR_PATCH}"
 
 export MAPR_MAIN_URL="http://package.mapr.com/releases/v5.2.0/ubuntu/"
 export MAPR_ECOSYSTEM_URL="http://package.mapr.com/releases/ecosystem-5.x/ubuntu"
