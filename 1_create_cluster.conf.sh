@@ -180,6 +180,12 @@ read -p "Enter the proxy information (blank for none): " DOCKER_PROXY
 
 echo ""
 echo "---------------------------------------"
+echo "If you need to specify a NO_PROXY string it's highly recommended. Use your subnets and internal domain names"
+echo "Example: \"192.168.0.0/16,mycompany.com\""
+read -p "Enter the noproxy information (blank for none): " DOCKER_NOPROXY
+
+echo ""
+echo "---------------------------------------"
 echo "User to run MapR Service as. We recommend mapr with UID 2000 as the default"
 read -p "Enter the user for MapR services: " -e -i "mapr" MAPR_USER
 
@@ -278,6 +284,7 @@ export DOCKER_REG_HOST="$DOCKER_REG_HOST"
 export DOCKER_REG_PORT="$DOCKER_REG_PORT"
 export DOCKER_REG_URL="\${DOCKER_REG_HOST}:\${DOCKER_REG_PORT}"
 export DOCKER_PROXY="$DOCKER_PROXY"
+export DOCKER_NOPROXY="$DOCKER_NOPROXY"
 
 
 export ZK_STRING="$ZK_STRING"
