@@ -104,7 +104,7 @@ echo "Information about the MapR versions will be saved in cluster.conf, please 
 
 echo ""
 echo "---------------------------------------"
-echo "Where would you like the MapR Installtion directory to be location on the physical host?"
+echo "Where would you like the MapR Installation directory to be location on the physical host?"
 echo "It should not be in /opt/mapr to avoid conflicts with clients or other things on the physical node"
 read -p "Mapr Installation Directory: " -e -i "/opt/maprdocker" MAPR_INST
 

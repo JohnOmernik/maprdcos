@@ -91,6 +91,7 @@ fi
 
 ssh $NODE_HOST "sudo /etc/init.d/mapr-posix-client-basic stop"
 ssh $NODE_HOST "sudo $REM_CMD $REM_POSIX"
+sleep 2
 ssh $NODE_HOST "sudo $REM_CMD $REM_CLIENT"
 
 

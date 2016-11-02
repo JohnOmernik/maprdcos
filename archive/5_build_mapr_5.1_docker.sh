@@ -2,53 +2,6 @@
 
 . ./cluster.conf
 
-VERS_FILE=$1
-
-if [ ! -f "$VERS_FILE" ]; then
-    echo "You must pass a version file to this script so it knows what to build"
-    echo ""
-    echo "Currently Included Versions:"
-    echo ""
-    ls -ls ./*.vers
-    echo ""
-    exit 1
-fi
-
-. $VERS_FILE
-
-echo "The Version you are asking me to build is $MAPR_VER patch $MAPR_PATCH"
-echo "The Docker tag will be $MAPR_DOCKER_TAG"
-echo ""
-echo "The Deb Repo is: $MAPR_MAIN_URL"
-echo "The Ecosystem Repo is: $MAPR_ECOSYSTEM_URL"
-echo ""
-
-D_CHK=$(sudo docker images|grep "maprdocker:"|grep $MAPR_DOCKER_TAG)
-
-if [ "$D_CHK" == "" ]; then
-    echo "It does NOT appear that version is built at this time"
-else
-    echo "It does appear that the image you are requesting to build already exist: This is ok"
-fi
-echo ""
-
-echo "If this information looks correct, you can now choose to build"
-read -e -p "Proceed to build (or rebuild) maprdocker:$MAPR_DOCKER_TAG image? " -i "N" BUILD
-
-if [ "$BUILD" != "Y" ]; then
-    echo "Not building"
-    exit 1
-else
-    echo "Building"
-fi
-
-
-if [ "$MAPR_PATCH_FILE" != "" ]; then
-    DOCKER_PATCH=" && wget ${MAPR_PATCH_ROOT}${MAPR_PATCH_FILE} && dpkg -i $MAPR_PATCH_FILE && rm $MAPR_PATCH_FILE && rm -rf /opt/mapr/.patch"
-else
-    DOCKER_PATCH=""
-fi
-
 CREDFILE="/home/zetaadm/creds/creds.txt"
 
 if [ ! -f "$CREDFILE" ]; then
@@ -59,10 +12,12 @@ fi
 MAPR_CRED=$(cat $CREDFILE|grep "mapr\:")
 ZETA_CRED=$(cat $CREDFILE|grep "zetaadm\:")
 
+
 rm -rf ./maprdocker
 
 mkdir ./maprdocker
 
+sudo docker rmi -f ${DOCKER_REG_URL}/maprdocker
 
 sudo docker pull ubuntu:latest
 
@@ -139,17 +94,19 @@ RUN echo "$ZETA_CRED"|chpasswd
 
 RUN usermod -a -G root mapr && usermod -a -G root zetaadm && usermod -a -G adm mapr && usermod -a -G adm zetaadm && usermod -a -G disk mapr && usermod -a -G disk zetaadm
 
-RUN echo "deb $MAPR_MAIN_URL mapr optional" > /etc/apt/sources.list.d/mapr.list
+RUN echo "deb http://package.mapr.com/releases/v5.1.0/ubuntu/ mapr optional" > /etc/apt/sources.list.d/mapr.list
 
-RUN echo "deb $MAPR_ECOSYSTEM_URL binary/" >> /etc/apt/sources.list.d/mapr.list
+RUN echo "deb http://package.mapr.com/releases/ecosystem-5.x/ubuntu binary/" >> /etc/apt/sources.list.d/mapr.list
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y libpam-ldap nscd openjdk-8-jre wget perl netcat syslinux-utils nfs-common
 
 RUN echo "Name: activate mkhomedir" > /usr/share/pam-configs/my_mkhomedir && echo "Default: yes" >> /usr/share/pam-configs/my_mkhomedir && echo "Priority: 900" >> /usr/share/pam-configs/my_mkhomedir && echo "Session-Type: Additional" >> /usr/share/pam-configs/my_mkhomedir && echo "Session:" >> /usr/share/pam-configs/my_mkhomedir && echo "      required               pam_mkhomedir.so umask=0022 skel=/etc/skel"
 
 RUN echo "base $LDAP_BASE" > /etc/ldap.conf && echo "uri $LDAP_URL" >> /etc/ldap.conf && echo "binddn $LDAP_RO_USER" >> /etc/ldap.conf && echo "bindpw $LDAP_RO_PASS" >> /etc/ldap.conf && echo "ldap_version 3" >> /etc/ldap.conf && echo "pam_password md5" >> /etc/ldap.conf && echo "bind_policy soft" >> /etc/ldap.conf
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --allow-unauthenticated libpam-ldap nscd openjdk-8-jre wget perl netcat syslinux-utils nfs-common mapr-core mapr-core-internal mapr-fileserver mapr-hadoop-core mapr-hbase mapr-mapreduce1 mapr-mapreduce2 mapr-cldb mapr-webserver mapr-nfs${DOCKER_PATCH} && rm -rf /var/lib/apt/lists/* && apt-get clean
-
 RUN DEBIAN_FRONTEND=noninteractive pam-auth-update && sed -i "s/compat/compat ldap/g" /etc/nsswitch.conf && /etc/init.d/nscd restart
+
+RUN apt-get install -y --allow-unauthenticated mapr-core mapr-core-internal mapr-fileserver mapr-hadoop-core mapr-hbase mapr-mapreduce1 mapr-mapreduce2 mapr-cldb mapr-webserver mapr-nfs
 
 ADD dockerrun.sh /opt/mapr/server/
 ADD dockerwarden.sh /opt/mapr/server/
@@ -164,8 +121,8 @@ EOL
 
 cd maprdocker
 
-sudo docker build -t ${DOCKER_REG_URL}/maprdocker:$MAPR_DOCKER_TAG .
-sudo docker push ${DOCKER_REG_URL}/maprdocker:$MAPR_DOCKER_TAG
+sudo docker build -t ${DOCKER_REG_URL}/maprdocker .
+sudo docker push ${DOCKER_REG_URL}/maprdocker
 
 cd ..
 rm -rf ./maprdocker
