@@ -305,7 +305,8 @@ cat > $MARFILE << MAREOF
     "volumes": [
       { "containerPath": "/opt/mapr/conf", "hostPath": "${MAPR_INST}/conf", "mode": "RW" },
       { "containerPath": "/opt/mapr/logs", "hostPath": "${MAPR_INST}/logs", "mode": "RW" },
-      { "containerPath": "/opt/mapr/roles", "hostPath": "${MAPR_INST}/roles", "mode": "RW" }
+      { "containerPath": "/opt/mapr/roles", "hostPath": "${MAPR_INST}/roles", "mode": "RW" },
+      { "containerPath": "/etc/localtime", "hostPath": "/etc/localtime", "mode": "RO" }
     ]
   }
 }

@@ -189,7 +189,8 @@ for ZK in $ZK_STRING; do
       { "containerPath": "/opt/mapr/conf", "hostPath": "${MAPR_INST}/conf", "mode": "RW" },
       { "containerPath": "/opt/mapr/zookeeper/zookeeper-3.4.5/logs", "hostPath": "${MAPR_INST}/zookeeper/logs", "mode": "RW" },
       { "containerPath": "/opt/mapr/zookeeper/zookeeper-3.4.5/conf", "hostPath": "${MAPR_INST}/zookeeper/conf", "mode": "RW" },
-      { "containerPath": "/opt/mapr/zkdata", "hostPath": "${MAPR_INST}/zkdata", "mode": "RW" }
+      { "containerPath": "/opt/mapr/zkdata", "hostPath": "${MAPR_INST}/zkdata", "mode": "RW" },
+      { "containerPath": "/etc/localtime", "hostPath": "/etc/localtime", "mode": "RO"}
     ]
   }
 }
