@@ -22,15 +22,15 @@ if [ ! -f "./ip_detect.sh" ]; then
 fi
 
 
-UBUNTU_MAPR_CLIENT_BASE="http://package.mapr.com/releases/v5.1.0/ubuntu/pool/optional/m/mapr-client/"
-UBUNTU_MAPR_CLIENT_FILE="mapr-client_5.1.0.37549.GA-1_amd64.deb"
-UBUNTU_MAPR_POSIX_BASE="http://package.mapr.com/releases/v5.1.0/ubuntu/pool/optional/m/mapr-posix-client-basic/"
-UBUNTU_MAPR_POSIX_FILE="mapr-posix-client-basic_5.1.0.37549.GA-1_amd64.deb"
+UBUNTU_MAPR_CLIENT_BASE="http://package.mapr.com/releases/v5.2.0/ubuntu/pool/optional/m/mapr-client/"
+UBUNTU_MAPR_CLIENT_FILE="mapr-client_5.2.0.39122.GA-1_amd64.deb"
+UBUNTU_MAPR_POSIX_BASE="http://archive.mapr.com/releases/v5.2.0/ubuntu/pool/optional/m/mapr-posix-client-basic/"
+UBUNTU_MAPR_POSIX_FILE="mapr-posix-client-basic_5.2.0.39122.GA-1_amd64.deb"
 
-RH_MAPR_CLIENT_BASE="http://package.mapr.com/releases/v5.1.0/redhat/"
-RH_MAPR_CLIENT_FILE="mapr-client-5.1.0.37549.GA-1.x86_64.rpm"
-RH_MAPR_POSIX_BASE="http://package.mapr.com/releases/v5.1.0/redhat/"
-RH_MAPR_POSIX_FILE="mapr-posix-client-basic-5.1.0.37549.GA-1.x86_64.rpm"
+UBUNTU_MAPR_PATCH_BASE="http://archive.mapr.com/patches/archives/v5.2.0/ubuntu/dists/binary/"
+UBUNTU_MAPR_PATCH_CLIENT_FILE="mapr-patch-client-5.2.0.39122.GA-39745.x86_64.deb"
+UBUNTU_MAPR_PATCH_POSIX_FILE="mapr-patch-posix-client-basic-5.2.0.39122.GA-39745.x86_64.deb"
+
 
 NODE_HOST=$1
 CLIENT_ONLY=$2
@@ -107,6 +107,10 @@ if [ "$INST_DIST" == "ubuntu" ]; then
         cd ./client_install
         wget ${UBUNTU_MAPR_CLIENT_BASE}${UBUNTU_MAPR_CLIENT_FILE}
         wget ${UBUNTU_MAPR_POSIX_BASE}${UBUNTU_MAPR_POSIX_FILE}
+        if [ "$UBUNTU_MAPR_PATCH_CLIENT_FILE" != "" ]; then
+            wget ${UBUNTU_MAPR_PATCH_BASE}${UBUNTU_MAPR_PATCH_CLIENT_FILE}
+            wget ${UBUNTU_MAPR_PATCH_BASE}${UBUNTU_MAPR_PATCH_POSIX_FILE}
+        fi
         cd ..
     fi
     INST_CLIENT=$UBUNTU_MAPR_CLIENT_FILE
@@ -132,7 +136,16 @@ fi
 
 scp ./client_install/$INST_CLIENT $NODE_HOST:/home/$IUSER/
 scp ./client_install/$INST_POSIX $NODE_HOST:/home/$IUSER/
+
+if [ "$UBUNTU_MAPR_PATCH_CLIENT_FILE" != "" ]; then
+    scp ./client_install/${UBUNTU_MAPR_PATCH_CLIENT_FILE} $NODE_HOST:/home/$IUSER/
+    scp ./client_install/${UBUNTU_MAPR_PATCH_POSIX_FILE} $NODE_HOST:/home/$IUSER/
+fi
+
 ssh $NODE_HOST "sudo $INST_CMD $INST_CLIENT"
+if [ "$UBUNTU_MAPR_PATCH_CLIENT_FILE" != "" ]; then
+    ssh $NODE_HOST "sudo $INST_CMD ${UBUNTU_MAPR_PATCH_CLIENT_FILE}"
+fi
 tee /tmp/fs_core.xml << EOL1
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
@@ -174,6 +187,12 @@ ssh $NODE_HOST "echo \"$NODE_HOST-fuse\"|sudo tee /opt/mapr/hostname"
 ssh $NODE_HOST "sudo /opt/mapr/server/configure.sh -N $CLUSTERNAME -c -C $CLDBS"
 ssh $NODE_HOST "sudo mkdir -p /mapr"
 ssh $NODE_HOST "sudo $INST_CMD $INST_POSIX"
+
+if [ "$UBUNTU_MAPR_PATCH_POSIX_FILE" != "" ]; then
+    ssh $NODE_HOST "sudo $INST_CMD ${UBUNTU_MAPR_PATCH_POSIX_FILE}"
+fi
+
+
 
 ssh $NODE_HOST "echo \". /opt/mapr/conf/env.sh\"|sudo tee -a /opt/mapr/initscripts/mapr-posix-client-basic"
 

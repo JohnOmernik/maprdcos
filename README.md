@@ -45,6 +45,13 @@ ExecStart=/user/bin/docker daemon --storage-driver=overlay --insecure-registry=m
 ## Create Users
 ---------------------
 MapR and this install needs some users created on all nodes. I recommend installing these users on all nodes, including masters. Use the script 0_zeta_user_prep.sh
+
+Note there is another repo that does this step as well. That's why the script is labeled 0_ ... you MAY NOT NEED IT
+
+https://github.com/JohnOmernik/dcosprep
+
+If you use this, or you manually do the steps in script 0, just skip it
+
 Some Notes:
 - The script will take a list of nodes and will ask for the password for mapr and zetaaadm and then sync passwords
 - The user the script runs as MUST have ssh and sudo permissions on all nodes
