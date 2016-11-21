@@ -4,7 +4,7 @@
 . ./cluster.conf
 
 ME=$(whoami)
-
+MEHOST=$(hostname)
 
 if [ "$ME" != "$IUSER" ]; then
     echo "This script must be run as the Initial User: $IUSER"
