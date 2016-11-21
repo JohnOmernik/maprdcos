@@ -63,7 +63,7 @@ fi
 
 for HOST in $CHOSTS; do
     echo "Updating and adding cert to $HOST"
-    ssh $HOST "sudo rm -f /usr/local/share/ca-certificates/zetaroot.crt && sudo update-ca-certificates -f && sudo curl -o /usr/local/share/ca-certificates/zetaroot.crt http://zetaca-shared.marathon.slave.mesos:10443/cacert && sudo update-ca-certificates && cat /etc/ssl/certs/zetaroot.pem|sudo tee -a /opt/mesosphere/active/python-requests/lib/python3.5/site-packages/requests/cacert.pem"
+    ssh $HOST "sudo rm -f /usr/local/share/ca-certificates/zetaroot.crt && sudo update-ca-certificates -f && sudo curl -o /usr/local/share/ca-certificates/zetaroot.crt http://zetaca-shared.marathon.slave.mesos:10443/cacert && sudo update-ca-certificates && cat /etc/ssl/certs/zetaroot.pem|sudo tee -a /opt/mesosphere/active/python-requests/lib/python3.5/site-packages/requests/cacert.pem && sudo service docker restart"
     echo ""
 done
 

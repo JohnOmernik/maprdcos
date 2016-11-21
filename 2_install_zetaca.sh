@@ -363,5 +363,23 @@ echo ""
 echo ""
 echo ""
 echo ""
+echo "Waiting for Zeta CA to start"
+sleep 20
+echo ""
 
+
+echo "Updating local certificates on INODES"
+
+TNODES=$(echo -n "$INODES"|tr ";" " ")
+OUTNODES=""
+for N in $TNODES; do
+    NODE=$(echo $N|cur -d":" -f1)
+    if [ "$OUTNODES" == "" ]; then
+        OUTNODES="$NODE"
+    else
+        OUTNODES="$OUTNODES $NODE"
+    fi
+done
+
+./host_zetaca_config.sh "$OUTNODES"
 
