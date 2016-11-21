@@ -49,7 +49,10 @@ cat > maprdocker.marathon << EOF
     "type": "DOCKER",
     "docker": {
       "image": "zeta/registry:2",
-      "network": "HOST"
+      "network": "BRIDGE",
+      "portMappings": [
+        { "containerPort": 5000, "hostPort": ${DOCKER_REG_PORT}, "servicePort": 0, "protocol": "tcp"}
+      ]
     },
     "volumes": [
       { "containerPath": "/var/lib/registry", "hostPath": "${DOCKER_IMAGE_LOC}", "mode": "RW" }
