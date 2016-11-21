@@ -36,12 +36,15 @@ sudo docker tag registry:2 zeta/registry:2
 
 APP_NAME="maprdocker"
 APP_CERT_LOC="/opt/maprdocker/dockercerts"
-mkdir -p ${APP_CERT_LOC}
+sudo mkdir -p ${APP_CERT_LOC}
 sudo chown zetaadm:root ${APP_CERT_LOC}
 sudo chmod 770 ${APP_CERT_LOC}
 CN_GUESS="maprdocker-mapr-shared.marathon.slave.mesos"
 
-/home/$IUSER/zetaca/gen_server_cert.sh
+
+
+. /home/$IUSER/zetaca/zetaca_env.sh
+. /home/$IUSER/zetaca/gen_server_cert.sh
 
 cat > maprdocker.marathon << EOF
 {
