@@ -373,7 +373,7 @@ echo "Updating local certificates on INODES"
 TNODES=$(echo -n "$INODES"|tr ";" " ")
 OUTNODES=""
 for N in $TNODES; do
-    NODE=$(echo $N|cur -d":" -f1)
+    NODE=$(echo $N|cut -d":" -f1)
     if [ "$OUTNODES" == "" ]; then
         OUTNODES="$NODE"
     else
