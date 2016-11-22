@@ -19,7 +19,7 @@ fi
 scp ./ip_detect.sh ${ME}@${MEHOST}:/home/${ME}/
 MEIP=$(ssh $MEHOST "/home/${ME}/ip_detect.sh")
 
-echo "You are running on $MEHOST($MEIP) is this where you wish to run the mapr docker registry?"
+echo "You are running on $MEHOST ($MEIP) is this where you wish to run the mapr docker registry?"
 read -p "Install on $MEHOST - " -e -i "Y" INSTALL_HERE
 
 if [ "$INSTALL_HERE" != "Y" ]; then
