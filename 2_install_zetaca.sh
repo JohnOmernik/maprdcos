@@ -370,16 +370,17 @@ echo ""
 
 echo "Updating local certificates on INODES"
 
+
+MEFULLHOST=$(hostname -f)
+
 TNODES=$(echo -n "$INODES"|tr ";" " ")
-OUTNODES=""
 for N in $TNODES; do
     NODE=$(echo $N|cut -d":" -f1)
-    if [ "$OUTNODES" == "" ]; then
-        OUTNODES="$NODE"
-    else
-        OUTNODES="$OUTNODES $NODE"
+    ./host_zetaca_config.sh $NODE 1
+    if [ "$NODE" == "$MEFULLHOST" ]; then
+        echo "This was the node that had the Zeta CA Running. We are going to pause 45 seconds for this to restart the zeta ca docker container"
+        sleep 45
     fi
 done
 
-./host_zetaca_config.sh "$OUTNODES"
 

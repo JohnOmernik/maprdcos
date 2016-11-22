@@ -22,9 +22,14 @@ fi
 
 # Make sure we only have one argument, if not, exit
 TEST=$2
+UNATTEND="0"
 if [ "$TEST" != "" ]; then
-    echo "Please only provide a single argument, enclosed by double quotes, of space separated node names to update"
-    exit 1
+    if [ "$TEST" != "1" ]; then
+        echo "Please only provide a single argument, enclosed by double quotes, of space separated node names to update"
+        exit 1
+    else
+        UNATTEND="1"
+    fi
 fi
 
 # Check to see if we are root (by running the $SUDO_TEST)
@@ -52,12 +57,16 @@ echo "If any of the above nodes do not say root next to the name, then the permi
 echo "If permissions are not set correctly, this script will not run well."
 
 # Verify that the user wants to continue
-read -p "Do you wish to proceed with this script? Y/N: " OURTEST
-if [ "$OURTEST" != "Y" ] && [ "$OURTEST" != "y" ]; then
-    echo "Exiting"
-    exit 0
-fi
+if [ "$UNATTEND" == "1" ]; then
+    echo "Unattended requested, I hope your permissions are correct!"
+else
+    read -p "Do you wish to proceed with this script? Y/N: " OURTEST
 
+    if [ "$OURTEST" != "Y" ] && [ "$OURTEST" != "y" ]; then
+        echo "Exiting"
+        exit 0
+    fi
+fi
 
 
 
