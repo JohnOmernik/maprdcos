@@ -18,7 +18,7 @@ fi
 scp ./ip_detect.sh ${ME}@${MEHOST}:/home/${ME}/
 MEIP=$(ssh $MEHOST "/home/${ME}/ip_detect.sh")
 
-echo "You are running on $MEHOST($MEIP) is this where you wish to run the mapr docker registry?"
+echo "You are running on $MEHOST ($MEIP) is this where you wish to run the mapr docker registry?"
 read -p "Install on $MEHOST - " -e -i "Y" INSTALL_HERE
 
 if [ "$INSTALL_HERE" != "Y" ]; then
@@ -364,7 +364,7 @@ echo ""
 echo ""
 echo ""
 echo "Waiting for Zeta CA to start"
-sleep 20
+sleep 30
 echo ""
 
 
@@ -386,6 +386,7 @@ done
 echo ""
 echo ""
 echo "This script only updated the agent nodes with the CA information, it's recommend that you run the ./host_zetaca_config.sh script on master nodes as well."
+echo ""
 echo "To do that, just run: $ ./host_zetaca_config.sh %IPOFMASTERNODE%"
 echo ""
 echo ""
