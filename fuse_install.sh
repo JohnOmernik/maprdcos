@@ -33,7 +33,7 @@ UBUNTU_MAPR_PATCH_POSIX_FILE="mapr-patch-posix-client-basic-5.2.0.39122.GA-39745
 
 
 NODE_HOST=$1
-CLIENT_ONLY=$2
+AUTO_INST=$2
 
 if [ "$NODE_HOST" == "" ]; then
     echo "This script must be passed a hostname"
@@ -78,8 +78,12 @@ if [ "$CURCHK" != "" ]; then
     exit 1
 fi
 
-echo "Installation requested on $NODE_HOST (Ubuntu) - No Previous Installation Detected"
-read -p "Continue with install? " -e -i "N" CONT
+if [ "$AUTO_INST" != "1" ]; then
+    echo "Installation requested on $NODE_HOST (Ubuntu) - No Previous Installation Detected"
+    read -p "Continue with install? " -e -i "N" CONT
+else
+    CONT="Y"
+fi
 
 if [ "$CONT" != "Y" ]; then
     echo "installation aborted"
@@ -99,7 +103,11 @@ mkdir -p ./client_install
 if [ "$INST_DIST" == "ubuntu" ]; then
     if [ ! -f "./client_install/$UBUNTU_MAPR_CLIENT_FILE" ] || [ ! -f "./client_install/$UBUNTU_MAPR_POSIX_FILE" ]; then
         echo "Couldn't find MapR Files"
-        read -p "Should we Download the Ubuntu files? (Installation will not continue if N) " -e -i "Y" DL
+        if [ "$AUTO_INST" != "1" ]; then
+            read -p "Should we Download the Ubuntu files? (Installation will not continue if N) " -e -i "Y" DL
+        else
+            DL="Y"
+        fi
         if [ "$DL" != "Y" ]; then
             echo "Can't continue without installation files"
             exit 1
