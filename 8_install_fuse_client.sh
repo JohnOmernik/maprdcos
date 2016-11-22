@@ -17,7 +17,8 @@ if [ "$INSTALL" != "Y" ]; then
 fi
 
 for NODE in $NODES; do
-    ./fuse_install.sh $NODE 1
+    N=$(echo $NODE|cut -d":" -f1)
+    ./fuse_install.sh $N 1
 done
 echo ""
 echo ""
