@@ -121,6 +121,7 @@ for NODE in $INODES; do
     CHK=$(echo $STARTED|grep $NODE_HOST)
     if [ "$CHK" == "" ]; then
         ./start_mapr_node.sh $NODE_HOST
+        echo ""
     fi
 done
 
