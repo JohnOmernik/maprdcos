@@ -383,4 +383,10 @@ for N in $TNODES; do
     fi
 done
 
+echo ""
+echo ""
+echo "This script only updated the agent nodes with the CA information, it's recommend that you run the ./host_zetaca_config.sh script on master nodes as well."
+echo "To do that, just run: $ ./host_zetaca_config.sh %IPOFMASTERNODE%"
+echo ""
+echo ""
 
