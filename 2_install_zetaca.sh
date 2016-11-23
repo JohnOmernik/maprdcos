@@ -261,6 +261,7 @@ cat > ${APP_HOME}/gen_java_keystore.sh << EOJKS
 #!/bin/bash
 # Now convert to JKS for Drill
 JAVA_HOME="/opt/mesosphere/active/java/usr/java"
+PATH=\$PATH:\$JAVA_HOME/bin
 CLUSTERNAME=\$(ls /mapr)
 . /mapr/\$CLUSTERNAME/zeta/shared/zetaca/gen_server_cert.sh
 
