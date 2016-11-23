@@ -21,6 +21,26 @@ MAPR_ID="2000"
 ZETAUSERS_GID="2501"
 HOSTS=$1
 
+CHECKZ=$(cat /etc/passwd|grep zetaadm)
+CHECKM=$(cat /etc/passwd|grep mapr)
+if [ "$CHECKZ" != "" ]; then
+    echo "This host already appears to have a zetaadm userin the /etc/passwd"
+    echo "It is likely that user prep was already done here, please proceed to the 1_ script"
+    echo ""
+    echo "$CHECKZ"
+    echo ""
+    exit 1
+fi
+if [ "$CHECKM" != "" ]; then
+    echo "This host already appears to have a mapr user in the /etc/passwd"
+    echo "It is likely that user prep was already done here, please proceed to the 1_ script"
+    echo ""
+    echo "$CHECKM"
+    echo ""
+    exit 1
+fi
+
+
 # Make sure that we have a list of hosts to use, if not, exit
 if [ "$HOSTS" == "" ]; then
     echo "This script takes a single argument, enclosed by double quotes, of space separated node names to update"
