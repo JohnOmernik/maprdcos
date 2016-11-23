@@ -2,7 +2,6 @@
 
 
 . ./cluster.conf
-
 ME=$(whoami)
 MEHOST=$(hostname)
 
@@ -261,6 +260,7 @@ chmod +x ${APP_HOME}/gen_server_cert.sh
 cat > ${APP_HOME}/gen_java_keystore.sh << EOJKS
 #!/bin/bash
 # Now convert to JKS for Drill
+JAVA_HOME="/opt/mesosphere/active/java/usr/java"
 CLUSTERNAME=\$(ls /mapr)
 . /mapr/\$CLUSTERNAME/zeta/shared/zetaca/gen_server_cert.sh
 
